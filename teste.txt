@@ -1,0 +1,16 @@
+int a = 5;
+int b = 10;
+int c;
+
+c = a + b;
+
+if (c > 10) {
+    c = c * 2;
+} else {
+    c = c / 2;
+}
+
+while (a < 20) {
+    a = a + 1;
+}
+
