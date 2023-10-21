@@ -1,10 +1,9 @@
-// symbol_table.h
-
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
 #define SYMBOL_SCALAR 1
 #define SYMBOL_LABEL  2
+#define TABLE_SIZE 100
 
 typedef struct symbol {
     char* identifier;
@@ -19,14 +18,16 @@ typedef struct symbol {
 } Symbol;
 
 
-#define TABLE_SIZE 100
+
+
 void iniciarTabela();
 unsigned int hash(char* key);
-// Protótipos das funções
+
 Symbol* inserirSimbolo(char* identifier, int type);
 Symbol* retornaSimbolo(char* identifier);
 void removerSimbolo(char* identifier);
-
+void print_simboloTabela();
 
 void print_simboloTabela() ;
-#endif // SYMBOL_TABLE_H
+
+#endif

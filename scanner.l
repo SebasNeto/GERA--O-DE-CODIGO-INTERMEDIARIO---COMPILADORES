@@ -1,15 +1,17 @@
+%{
+   
+#include "tabelaSimbolos.h"
+#include "codegen.h"
+#include "parser.tab.h"
+
+#include <stdio.h>
+void yyerror(const char *s);
+%}
+
 %option yylineno
 %option noyywrap
 
-%{
-
-#include "parser.tab.h"
-#include "tabelaSimbolos.h"
-#include "codegen.h"
-#include <stdio.h>
-void yyerror(const char *s);
-
-%}
+%x COMMENT
 
 %%
 
@@ -28,33 +30,41 @@ void yyerror(const char *s);
 ">"                  { printf("TOKEN: GT\n"); return GT; }
 ">="                 { printf("TOKEN: GEQ\n"); return GEQ; }
 "!="                 { printf("TOKEN: NEQ\n");return NEQ; }
+"+"|"-"|"*"|"/"|"<"|"="|";"|","|"("|")"|"["|"]"|"{"|"}"|">"|"!"|"&" { printf("TOKEN: %c\n", yytext[0]);  return yytext[0]; }
 
-"+"|"-"|"*"|"/"|"<"|"="|";"|","|"("|")"|"["|"]"|"{"|"}"|">"|"!"|"&" {printf("TOKEN: %c\n", yytext[0]);  return yytext[0]; }
+"/*"                 { BEGIN(COMMENT); }
+<COMMENT>"*/"        { BEGIN(INITIAL); }
+<COMMENT>.|\n        { /* ignora qualquer caractere dentro de um comentário */ }
 
-[0-9]+ {
+[0-9]+               {
    yylval.intValue = atoi(yytext);
    printf("TOKEN: LIT_INT %s\n", yytext); 
    return LIT_INT; 
 }
+
 [0-9]+[.][0-9]+ {
-   yylval.realValue = atof(yytext);
+   yylval.floatValue = atof(yytext);   // nota que a estrutura yylval deve ter um campo chamado floatValue
    printf("TOKEN: LIT_REAL %s\n", yytext); 
    return LIT_REAL; 
 }
 
-'.'                  { printf("TOKEN: LIT_CHAR %s\n", yytext); return LIT_CHAR; }
+'\''[^\']'\'' { 
+   yylval.strValue = strdup(&yytext[1]);
+   printf("TOKEN: LIT_CHAR %c\n", yytext[1]); 
+   return LIT_CHAR; 
+}
+
 
 [a-zA-Z_][a-zA-Z_0-9]* {
-    SYMBOL_TABLE_ENTRY* entry = addSymbol(yytext);
-    yylval.symbolEntry = entry;
-    printf("ID: %s\n", yytext);
-    return ID;
+   Symbol* entry = inserirSimbolo(yytext, 0);  // Assumindo que inserirSimbolo foi corretamente definido para retornar um ponteiro para Symbol
+   yylval.symbolEntry = entry;
+   printf("ID: %s\n", yytext);
+   return ID;
 }
 
 "//"[^"\n"]*          { /* Ignora comentários de uma linha */ }
-"/*"(.|\n)*?"*/"     { /* Ignora comentários de várias linhas */ }
 
-[ \t\r\n]+           /* Ignora espaços em branco e quebras de linha */
+[ \t\r\n]+           { /* Ignora espaços em branco e quebras de linha */ }
 .                    { yyerror("Caractere inválido"); }
 
 %%

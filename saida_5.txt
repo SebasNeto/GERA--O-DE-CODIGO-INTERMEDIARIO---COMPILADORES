@@ -1,0 +1,17 @@
+Erro sintático na linha 4, próximo ao token 'a': Variable not declared
+TOKEN: KW_INT
+ID: a
+TOKEN: =
+TOKEN: LIT_INT 5
+TOKEN: ;
+TOKEN: KW_INT
+ID: b
+TOKEN: =
+TOKEN: LIT_INT 10
+TOKEN: ;
+TOKEN: KW_INT
+ID: c
+TOKEN: ;
+ID: c
+TOKEN: =
+ID: a

@@ -1,6 +1,7 @@
 // simboloTabela.c
 
 #include "tabelaSimbolos.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
