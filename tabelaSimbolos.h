@@ -5,6 +5,7 @@
 #define SYMBOL_LABEL  2
 #define TABLE_SIZE 100
 
+//Representa um símbolo na tabela de símbolos.
 typedef struct symbol {
     char* identifier;
     int type;

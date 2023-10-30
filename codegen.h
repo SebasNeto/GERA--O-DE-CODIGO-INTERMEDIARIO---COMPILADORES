@@ -4,6 +4,8 @@
 #define TYPE_INT    1
 #define TYPE_FLOAT  2
 
+#include "tabelaSimbolos.h"
+
 // Enumeraçõe
 typedef enum {
     TAC_SYMBOL, TAC_MOVE, TAC_SUB, TAC_VAR, TAC_DIV, TAC_ADD, TAC_MUL, 
@@ -20,21 +22,21 @@ typedef enum {
     AST_WHILE,
 } AST_TYPE;
 
-// Estruturas
+// Estrutura TAC - representa o código de 3 endereçõs 
 typedef struct tac {
-    TAC_TYPE type;
-    Symbol *res;
-    Symbol *op1;
-    Symbol *op2;
-    struct tac *prev;
+    TAC_TYPE type; //tipo representado por TAC_TYPE
+    Symbol *res; //simbolo
+    Symbol *op1; //simbolo
+    Symbol *op2; //simbolo
+    struct tac *tacAnterior; //ponteito para o tacAnterior 
 } TAC;
 
-//arvores abstrata
+//arvores sintatica abstrata 
 typedef struct ast {
-    AST_TYPE type;
-    struct ast *left;
-    struct ast *middle;
-    struct ast *right;
+    AST_TYPE type; //tipo do nodo 
+    struct ast *filhoAEsquerda; //a + b ; filhoAquerda-> a
+    struct ast *filhoMeio;
+    struct ast *filhoADireita; // a + b ; filhoADireita-> b
     Symbol* symbol;
 } AST;
 

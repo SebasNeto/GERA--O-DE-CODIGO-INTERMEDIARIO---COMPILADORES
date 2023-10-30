@@ -15,6 +15,7 @@ void yyerror(const char *s);
 
 %}
 
+//tipos de dados dos simbolos terminais e nao terminais
 %union {
     int intValue;
     float floatValue;
@@ -23,6 +24,7 @@ void yyerror(const char *s);
     TAC* tac;        
 }
 
+//%type - tipo de dado de um simbolo nao terminal
 %token <strValue> ID
 %type<tac> comando
 %type<tac> init_val

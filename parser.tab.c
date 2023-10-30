@@ -558,11 +558,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    47,    47,    49,    50,    53,    54,    58,    61,    72,
-      86,    90,    94,   100,   102,   103,   106,   107,   111,   117,
-     118,   119,   120,   123,   130,   143,   156,   171,   178,   179,
-     180,   181,   182,   183,   186,   191,   196,   202,   207,   212,
-     219,   224,   229,   233
+       0,    49,    49,    51,    52,    55,    56,    60,    63,    74,
+      88,    92,    96,   102,   104,   105,   108,   109,   113,   119,
+     120,   121,   122,   125,   132,   145,   158,   173,   180,   181,
+     182,   183,   184,   185,   188,   193,   198,   204,   209,   214,
+     221,   226,   231,   235
 };
 #endif
 
@@ -1171,7 +1171,7 @@ yyreduce:
   switch (yyn)
     {
   case 8: /* decl_var: espec_tipo var '=' init_val ';'  */
-#line 62 "parser.y"
+#line 64 "parser.y"
 {
     Symbol* sym = retornaSimbolo((yyvsp[-3].strValue));
     if (sym) {
@@ -1186,7 +1186,7 @@ yyreduce:
     break;
 
   case 9: /* decl_var: espec_tipo var ';'  */
-#line 73 "parser.y"
+#line 75 "parser.y"
 {
     Symbol* sym = retornaSimbolo((yyvsp[-1].strValue));
     if (sym) {
@@ -1201,7 +1201,7 @@ yyreduce:
     break;
 
   case 10: /* init_val: LIT_INT  */
-#line 87 "parser.y"
+#line 89 "parser.y"
     { 
         (yyval.tac) = tac_create(TAC_MOVE, makeTemp(), makeConstant(TYPE_INT, &(yyvsp[0].intValue)), NULL); 
     }
@@ -1209,7 +1209,7 @@ yyreduce:
     break;
 
   case 11: /* init_val: LIT_REAL  */
-#line 91 "parser.y"
+#line 93 "parser.y"
     {
         (yyval.tac) = tac_create(TAC_MOVE, makeTemp(), makeConstant(TYPE_FLOAT, &(yyvsp[0].floatValue)), NULL);
     }
@@ -1217,7 +1217,7 @@ yyreduce:
     break;
 
   case 12: /* init_val: INPUT '(' espec_tipo ')'  */
-#line 95 "parser.y"
+#line 97 "parser.y"
     { 
         (yyval.tac) = tac_create(TAC_INPUT, makeTemp(), NULL, NULL); 
     }
@@ -1225,25 +1225,25 @@ yyreduce:
     break;
 
   case 13: /* var: ID  */
-#line 100 "parser.y"
+#line 102 "parser.y"
         { (yyval.strValue) = (yyvsp[0].strValue); }
 #line 1231 "parser.tab.c"
     break;
 
   case 14: /* espec_tipo: KW_INT  */
-#line 102 "parser.y"
+#line 104 "parser.y"
                    { (yyval.intValue) = 1; }
 #line 1237 "parser.tab.c"
     break;
 
   case 15: /* espec_tipo: KW_CHAR  */
-#line 103 "parser.y"
+#line 105 "parser.y"
                     { (yyval.intValue) = 2; }
 #line 1243 "parser.tab.c"
     break;
 
   case 18: /* com_atrib: var '=' exp ';'  */
-#line 112 "parser.y"
+#line 114 "parser.y"
 {
     (yyval.tac) = concatCode((yyvsp[-1].tac), tac_create(TAC_MOVE, retornaSimbolo((yyvsp[-3].strValue)), NULL, (yyvsp[-1].tac)->res));
 }
@@ -1251,7 +1251,7 @@ yyreduce:
     break;
 
   case 23: /* com_selecao: IF '(' exp ')' comando  */
-#line 124 "parser.y"
+#line 126 "parser.y"
 {
     Symbol* newLabel = makeLabel();
     (yyval.tac) = concatCode((yyvsp[-2].tac), tac_create(TAC_IFZ, (yyvsp[-2].tac)->res, newLabel, NULL));
@@ -1262,7 +1262,7 @@ yyreduce:
     break;
 
   case 24: /* com_selecao: IF '(' exp ')' comando ELSE comando  */
-#line 131 "parser.y"
+#line 133 "parser.y"
 {
     Symbol* elseLabel = makeLabel();
     Symbol* endLabel = makeLabel();
@@ -1277,7 +1277,7 @@ yyreduce:
     break;
 
   case 25: /* com_repeticao: WHILE '(' exp ')' comando  */
-#line 144 "parser.y"
+#line 146 "parser.y"
 {
     Symbol* beginLabel = makeLabel();
     Symbol* endLabel = makeLabel();
@@ -1292,7 +1292,7 @@ yyreduce:
     break;
 
   case 26: /* exp: exp_soma op_relac exp_soma  */
-#line 157 "parser.y"
+#line 159 "parser.y"
 {
     int tacType;
     switch((yyvsp[-1].intValue)) {
@@ -1311,7 +1311,7 @@ yyreduce:
     break;
 
   case 27: /* exp: exp_soma  */
-#line 172 "parser.y"
+#line 174 "parser.y"
 {
     (yyval.tac) = (yyvsp[0].tac);
 }
@@ -1319,43 +1319,43 @@ yyreduce:
     break;
 
   case 28: /* op_relac: EQ  */
-#line 178 "parser.y"
+#line 180 "parser.y"
        { (yyval.intValue) = TAC_EQ; }
 #line 1325 "parser.tab.c"
     break;
 
   case 29: /* op_relac: NEQ  */
-#line 179 "parser.y"
+#line 181 "parser.y"
         { (yyval.intValue) = TAC_NEQ; }
 #line 1331 "parser.tab.c"
     break;
 
   case 30: /* op_relac: LT  */
-#line 180 "parser.y"
+#line 182 "parser.y"
        { (yyval.intValue) = TAC_LT; }
 #line 1337 "parser.tab.c"
     break;
 
   case 31: /* op_relac: GT  */
-#line 181 "parser.y"
+#line 183 "parser.y"
        { (yyval.intValue) = TAC_GT; }
 #line 1343 "parser.tab.c"
     break;
 
   case 32: /* op_relac: LEQ  */
-#line 182 "parser.y"
+#line 184 "parser.y"
         { (yyval.intValue) = TAC_LEQ; }
 #line 1349 "parser.tab.c"
     break;
 
   case 33: /* op_relac: GEQ  */
-#line 183 "parser.y"
+#line 185 "parser.y"
         { (yyval.intValue) = TAC_GEQ; }
 #line 1355 "parser.tab.c"
     break;
 
   case 34: /* exp_soma: exp_soma '+' exp_mult  */
-#line 187 "parser.y"
+#line 189 "parser.y"
 {
     (yyval.tac) = concatCode((yyvsp[-2].tac), (yyvsp[0].tac));
     (yyval.tac) = concatCode((yyval.tac), tac_create(TAC_ADD, makeTemp(), (yyvsp[-2].tac)->res, (yyvsp[0].tac)->res));
@@ -1364,7 +1364,7 @@ yyreduce:
     break;
 
   case 35: /* exp_soma: exp_soma '-' exp_mult  */
-#line 192 "parser.y"
+#line 194 "parser.y"
 {
     (yyval.tac) = concatCode((yyvsp[-2].tac), (yyvsp[0].tac));
     (yyval.tac) = concatCode((yyval.tac), tac_create(TAC_SUB, makeTemp(), (yyvsp[-2].tac)->res, (yyvsp[0].tac)->res));
@@ -1373,7 +1373,7 @@ yyreduce:
     break;
 
   case 36: /* exp_soma: exp_mult  */
-#line 197 "parser.y"
+#line 199 "parser.y"
 {
     (yyval.tac) = (yyvsp[0].tac);
 }
@@ -1381,7 +1381,7 @@ yyreduce:
     break;
 
   case 37: /* exp_mult: exp_mult '*' exp_simples  */
-#line 203 "parser.y"
+#line 205 "parser.y"
 {
     (yyval.tac) = concatCode((yyvsp[-2].tac), (yyvsp[0].tac));
     (yyval.tac) = concatCode((yyval.tac), tac_create(TAC_MUL, makeTemp(), (yyvsp[-2].tac)->res, (yyvsp[0].tac)->res));
@@ -1390,7 +1390,7 @@ yyreduce:
     break;
 
   case 38: /* exp_mult: exp_mult '/' exp_simples  */
-#line 208 "parser.y"
+#line 210 "parser.y"
 {
     (yyval.tac) = concatCode((yyvsp[-2].tac), (yyvsp[0].tac));
     (yyval.tac) = concatCode((yyval.tac), tac_create(TAC_DIV, makeTemp(), (yyvsp[-2].tac)->res, (yyvsp[0].tac)->res));
@@ -1399,7 +1399,7 @@ yyreduce:
     break;
 
   case 39: /* exp_mult: exp_simples  */
-#line 213 "parser.y"
+#line 215 "parser.y"
 {
     (yyval.tac) = (yyvsp[0].tac);
 }
@@ -1407,7 +1407,7 @@ yyreduce:
     break;
 
   case 40: /* exp_simples: LIT_INT  */
-#line 220 "parser.y"
+#line 222 "parser.y"
     { 
         Symbol* temp = makeTemp();
         (yyval.tac) = tac_create(TAC_MOVE, temp, makeConstant(TYPE_INT, &(yyvsp[0].intValue)), NULL);
@@ -1416,7 +1416,7 @@ yyreduce:
     break;
 
   case 41: /* exp_simples: LIT_REAL  */
-#line 225 "parser.y"
+#line 227 "parser.y"
     {
         Symbol* temp = makeTemp();
         (yyval.tac) = tac_create(TAC_MOVE, temp, makeConstant(TYPE_FLOAT, &(yyvsp[0].floatValue)), NULL);
@@ -1425,7 +1425,7 @@ yyreduce:
     break;
 
   case 42: /* exp_simples: ID  */
-#line 230 "parser.y"
+#line 232 "parser.y"
     { 
         (yyval.tac) = tac_create(TAC_VAR, retornaSimbolo((yyvsp[0].strValue)), NULL, NULL); 
     }
@@ -1433,7 +1433,7 @@ yyreduce:
     break;
 
   case 43: /* exp_simples: '(' exp ')'  */
-#line 234 "parser.y"
+#line 236 "parser.y"
     { 
         (yyval.tac) = (yyvsp[-1].tac); 
     }
@@ -1634,7 +1634,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 239 "parser.y"
+#line 241 "parser.y"
 
 
 

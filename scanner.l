@@ -30,6 +30,7 @@ void yyerror(const char *s);
 ">"                  { printf("TOKEN: GT\n"); return GT; }
 ">="                 { printf("TOKEN: GEQ\n"); return GEQ; }
 "!="                 { printf("TOKEN: NEQ\n");return NEQ; }
+";"                 { printf("TOKEN: %c\n", yytext[0]);return yytext[0]; }
 "+"|"-"|"*"|"/"|"<"|"="|";"|","|"("|")"|"["|"]"|"{"|"}"|">"|"!"|"&" { printf("TOKEN: %c\n", yytext[0]);  return yytext[0]; }
 
 "/*"                 { BEGIN(COMMENT); }
@@ -56,11 +57,15 @@ void yyerror(const char *s);
 
 
 [a-zA-Z_][a-zA-Z_0-9]* {
-   Symbol* entry = inserirSimbolo(yytext, 0);  // Assumindo que inserirSimbolo foi corretamente definido para retornar um ponteiro para Symbol
+   Symbol* entry = retornaSimbolo(yytext); 
+   if (!entry) {
+       entry = inserirSimbolo(yytext, 0); 
+   }
    yylval.symbolEntry = entry;
    printf("ID: %s\n", yytext);
    return ID;
 }
+
 
 "//"[^"\n"]*          { /* Ignora comentários de uma linha */ }
 
