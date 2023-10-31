@@ -24,7 +24,7 @@ typedef struct symbol {
 void iniciarTabela();
 unsigned int hash(char* key);
 
-Symbol* inserirSimbolo(char* identifier, int type);
+Symbol* inserirSimbolo( int type, char* identifier);
 Symbol* retornaSimbolo(char* identifier);
 void removerSimbolo(char* identifier);
 void print_simboloTabela();

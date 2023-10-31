@@ -25,11 +25,11 @@ unsigned int hash(char* key) {
 }
 
 //Insere um novo símbolo na tabela de símbolos
-Symbol* inserirSimbolo(char* identifier, int type) {
+Symbol* inserirSimbolo( int type, char* identifier) {
 
     unsigned int slot = hash(identifier);
-    printf("Inserindo símbolo: %s\n", identifier);
-    printf("Inserindo símbolo na tabela a partir de: %s, função: %s(), linha: %d\n", __FILE__, __func__, __LINE__);
+    //printf("Inserindo símbolo: %s\n", identifier);
+    //printf("Inserindo símbolo na tabela a partir de: %s, função: %s(), linha: %d\n", __FILE__, __func__, __LINE__);
     Symbol* novoSimbolo = (Symbol*) malloc(sizeof(Symbol));
     novoSimbolo->identifier = strdup(identifier);
     novoSimbolo->type = type;
@@ -54,7 +54,7 @@ Symbol* inserirSimbolo(char* identifier, int type) {
     }
 
     printf("Símbolo inserido: %s\n", identifier);
-    printf("type: %d\n", type);
+    //printf("type: %d\n", type);
 
     return novoSimbolo;
 }

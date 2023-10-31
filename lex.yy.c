@@ -953,7 +953,7 @@ YY_RULE_SETUP
 {
    Symbol* entry = retornaSimbolo(yytext); 
    if (!entry) {
-       entry = inserirSimbolo(yytext, 0); 
+      entry = inserirSimbolo(0, yytext); 
    }
    yylval.symbolEntry = entry;
    printf("ID: %s\n", yytext);

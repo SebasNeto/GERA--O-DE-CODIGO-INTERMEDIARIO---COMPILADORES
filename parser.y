@@ -2,7 +2,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "lex.yy.h"
+
 #include "tabelaSimbolos.h"
 #include "codegen.h"
 
@@ -15,232 +17,208 @@ void yyerror(const char *s);
 
 %}
 
-//tipos de dados dos simbolos terminais e nao terminais
+%token KW_INT KW_REAL VOID
+%token IF ELSE WHILE LOOP INPUT RETURN
+%token EQ LEQ LT GT GEQ NEQ
+%token LIT_INT LIT_REAL LIT_CHAR
+%token ID
+
 %union {
     int intValue;
     float floatValue;
-    char* strValue;
-    Symbol* symbolEntry;
-    TAC* tac;        
+    char *strValue;
+    Symbol *symbolEntry;
+    int tipo;
 }
 
-//%type - tipo de dado de um simbolo nao terminal
-%token <strValue> ID
-%type<tac> comando
-%type<tac> init_val
-%type<intValue> op_relac
-%type<tac> exp_simples
-%type<intValue> espec_tipo
-%type<strValue> var
-%token<intValue> LIT_INT
-%token<floatValue> LIT_REAL
-%type<tac> decl_var com_atrib com_selecao com_repeticao exp exp_soma exp_mult
-%token INT VOID
-%token LIT_CHAR
-%token LOOP
-%token INPUT
-%token IF ELSE WHILE RETURN
-%token EQ LEQ LT GT GEQ NEQ PLUS MINUS TIMES DIV MOD
-%token<intValue> KW_CHAR KW_INT KW_REAL
-%start programa
+%type <intValue> LIT_INT
+%type <floatValue> LIT_REAL
+%type <strValue> LIT_CHAR
+%type <symbolEntry> ID
+%type <tipo> espec_tipo
+
+%type <symbolEntry> var
+%type <symbolEntry> exp
 
 %%
 
-programa: lista_decl lista_com;
+programa: 
+    lista_decl lista_com
+    ;
 
-lista_decl: lista_decl decl
-          | decl
-          ;
+lista_decl:
+    lista_decl decl
+    | decl
+    ;
 
-decl: decl_var
+decl:
+    decl_var
     | decl_func
     ;
 
-decl_func: /* Temporário */
-    ID '(' ')' ';' 
+decl_var:
+    espec_tipo ID {
+        Symbol* entry = inserirSimbolo($1, $2->identifier);
+    } ';'  // Permite declarações sem inicialização
+    | espec_tipo ID {
+        Symbol* entry = inserirSimbolo($1, $2->identifier);
+    } '=' literais ';'  // Permite declarações com inicialização
     ;
 
-decl_var: espec_tipo var '=' init_val ';'
-{
-    Symbol* sym = retornaSimbolo($2);
-    if (sym) {
-        yyerror("Variable already declared");
-        exit(1);
-    } else {
-        inserirSimbolo($2, $1);
-    }
-    $$ = concatCode($4, tac_create(TAC_MOVE, retornaSimbolo($2), NULL, $4->res));
-}
-| espec_tipo var ';'
-{
-    Symbol* sym = retornaSimbolo($2);
-    if (sym) {
-        yyerror("Variable already declared");
-        exit(1);
-    } else {
-        inserirSimbolo($2, $1);
-    }
-    $$ = NULL;
-}
-;
 
+espec_tipo:
+    KW_INT { $$ = SYMBOL_SCALAR; }
+    | KW_REAL { $$ = SYMBOL_SCALAR; }
+    | VOID { $$ = SYMBOL_SCALAR; }
+    ;
 
-init_val: LIT_INT 
-    { 
-        $$ = tac_create(TAC_MOVE, makeTemp(), makeConstant(TYPE_INT, &$1), NULL); 
-    }
-    | LIT_REAL
-    {
-        $$ = tac_create(TAC_MOVE, makeTemp(), makeConstant(TYPE_FLOAT, &$1), NULL);
-    }
-    | INPUT '(' espec_tipo ')' 
-    { 
-        $$ = tac_create(TAC_INPUT, makeTemp(), NULL, NULL); 
-    }
-;
+decl_func:
+    espec_tipo ID '(' params ')' com_comp
+    ;
 
-var: ID { $$ = $1; } ;
+params:
+    lista_param
+    | VOID
+    | /* vazio */
+    ;
 
-espec_tipo: KW_INT { $$ = 1; }
-          | KW_CHAR { $$ = 2; }
-          ;
+lista_param:
+    lista_param ',' param
+    | param
+    ;
 
-lista_com: lista_com comando
-| comando
-;
+param:
+    espec_tipo var
+    ;
 
+decl_locais:
+    decl_locais decl_var
+    | /* vazio */
+    ;
 
-com_atrib: var '=' exp ';'
-{
-    $$ = concatCode($3, tac_create(TAC_MOVE, retornaSimbolo($1), NULL, $3->res));
-};
+lista_com:
+    comando lista_com
+    | /* vazio */
+    ;
 
 comando:
-    '{' lista_com '}'  
-|   com_atrib          
-|   com_selecao        
-|   com_repeticao      
-;
+    com_expr
+    | com_atrib
+    | com_comp
+    | com_selecao
+    | com_repeticao
+    | com_retorno
+    ;
 
-com_selecao: IF '(' exp ')' comando
-{
-    Symbol* newLabel = makeLabel();
-    $$ = concatCode($3, tac_create(TAC_IFZ, $3->res, newLabel, NULL));
-    $$ = tac_join($$, $5);
-    $$ = concatCode($$, tac_create(TAC_LABEL, newLabel, NULL, NULL));
-}
-| IF '(' exp ')' comando ELSE comando
-{
-    Symbol* elseLabel = makeLabel();
-    Symbol* endLabel = makeLabel();
-    $$ = concatCode($3, tac_create(TAC_IFZ, $3->res, elseLabel, NULL));
-    $$ = tac_join($$, $5);
-    $$ = concatCode($$, tac_create(TAC_JUMP, endLabel, NULL, NULL));
-    $$ = concatCode($$, tac_create(TAC_LABEL, elseLabel, NULL, NULL));
-    $$ = tac_join($$, $7);
-    $$ = concatCode($$, tac_create(TAC_LABEL, endLabel, NULL, NULL));
-}
-;
+com_expr:
+    exp ';'
+    | ';'
+    ;
 
-com_repeticao: WHILE '(' exp ')' comando
-{
-    Symbol* beginLabel = makeLabel();
-    Symbol* endLabel = makeLabel();
-    $$ = tac_create(TAC_LABEL, beginLabel, NULL, NULL);
-    $$ = concatCode($$, $3);
-    $$ = concatCode($$, tac_create(TAC_IFZ, $3->res, endLabel, NULL));
-    $$ = tac_join($$, $5);
-    $$ = concatCode($$, tac_create(TAC_JUMP, beginLabel, NULL, NULL));
-    $$ = concatCode($$, tac_create(TAC_LABEL, endLabel, NULL, NULL));
-}
-;
-
-exp: exp_soma op_relac exp_soma
-{
-    int tacType;
-    switch($2) {
-        case LT: tacType = TAC_LT; break;
-        case GT: tacType = TAC_GT; break;
-        case LEQ: tacType = TAC_LEQ; break;
-        case GEQ: tacType = TAC_GEQ; break;
-        case EQ: tacType = TAC_EQ; break;
-        case NEQ: tacType = TAC_NEQ; break;
-        default: yyerror("Invalid relational operator"); exit(1);
+com_atrib:
+    var '=' exp ';' {
+        Symbol* varEntry = retornaSimbolo($1->identifier);
+        if (!varEntry) {
+            yyerror("Variável não declarada");
+        }else{
+            //generateCode
+        }
     }
-    $$ = concatCode($1, $3);
-    $$ = concatCode($$, tac_create(tacType, makeTemp(), $1->res, $3->res));
-}
-| exp_soma
-{
-    $$ = $1;
-}
-;
+    ;
+
+com_comp:
+    '{' decl_locais lista_com '}'
+    ;
+
+com_selecao:
+    IF '(' exp ')' comando
+    | IF '(' exp ')' com_comp ELSE comando
+    ;
+
+com_repeticao:
+    WHILE '(' exp ')' comando
+    ;
+
+com_retorno:
+    RETURN ';'
+    | RETURN exp ';'
+    ;
+
+exp:
+    exp_soma op_relac exp_soma
+    | exp_soma
+    ;
 
 op_relac:
-    EQ { $$ = TAC_EQ; }
-|   NEQ { $$ = TAC_NEQ; }
-|   LT { $$ = TAC_LT; }
-|   GT { $$ = TAC_GT; }
-|   LEQ { $$ = TAC_LEQ; }
-|   GEQ { $$ = TAC_GEQ; }
-;
+    LEQ
+    | LT
+    | GT
+    | GEQ
+    | EQ
+    | NEQ
+    ;
 
-exp_soma: exp_soma '+' exp_mult
-{
-    $$ = concatCode($1, $3);
-    $$ = concatCode($$, tac_create(TAC_ADD, makeTemp(), $1->res, $3->res));
-}
-| exp_soma '-' exp_mult
-{
-    $$ = concatCode($1, $3);
-    $$ = concatCode($$, tac_create(TAC_SUB, makeTemp(), $1->res, $3->res));
-}
-| exp_mult
-{
-    $$ = $1;
-}
-;
+exp_soma:
+    exp_soma op_soma exp_mult
+    | exp_mult
+    ;
 
-exp_mult: exp_mult '*' exp_simples
-{
-    $$ = concatCode($1, $3);
-    $$ = concatCode($$, tac_create(TAC_MUL, makeTemp(), $1->res, $3->res));
-}
-| exp_mult '/' exp_simples
-{
-    $$ = concatCode($1, $3);
-    $$ = concatCode($$, tac_create(TAC_DIV, makeTemp(), $1->res, $3->res));
-}
-| exp_simples
-{
-    $$ = $1;
-}
-;
+op_soma:
+    '+'
+    | '-'
+    ;
 
-exp_simples: 
-    LIT_INT 
-    { 
-        Symbol* temp = makeTemp();
-        $$ = tac_create(TAC_MOVE, temp, makeConstant(TYPE_INT, &$1), NULL);
-    }
+exp_mult:
+    exp_mult op_mult exp_simples
+    | exp_simples
+    ;
+
+op_mult:
+    '*'
+    | '/'
+    | '%'
+    ;
+
+exp_simples:
+    '(' exp ')'
+    | var
+    | cham_func
+    | literais
+    ;
+
+literais:
+    LIT_INT
     | LIT_REAL
-    {
-        Symbol* temp = makeTemp();
-        $$ = tac_create(TAC_MOVE, temp, makeConstant(TYPE_FLOAT, &$1), NULL);
+    | LIT_CHAR
+    ;
+
+cham_func:
+    ID '(' args ')'
+    ;
+
+var:
+    ID {
+        $$ = retornaSimbolo($1->identifier);
+        if (!$$) {
+            yyerror("Variável não declarada");
+        }
     }
-    | ID 
-    { 
-        $$ = tac_create(TAC_VAR, retornaSimbolo($1), NULL, NULL); 
+    | ID '[' LIT_INT ']' {
+        // Tratamento de arrays, se necessário
     }
-    | '(' exp ')' 
-    { 
-        $$ = $2; 
-    }
-;
+    ;
+
+args:
+    lista_arg
+    | /* vazio */
+    ;
+
+lista_arg:
+    lista_arg ',' exp
+    | exp
+    ;
 
 %%
-
-
 
 int getLineNumber(void) {
     return yylineno;
@@ -249,4 +227,3 @@ int getLineNumber(void) {
 void yyerror(const char *s) {
     fprintf(stderr, "Erro sintático na linha %d, próximo ao token '%s': %s\n", yylineno, yytext, s);
 }
-

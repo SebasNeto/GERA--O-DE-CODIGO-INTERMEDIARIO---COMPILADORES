@@ -54,32 +54,25 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    LIT_INT = 259,                 /* LIT_INT  */
-    LIT_REAL = 260,                /* LIT_REAL  */
-    INT = 261,                     /* INT  */
-    VOID = 262,                    /* VOID  */
-    LIT_CHAR = 263,                /* LIT_CHAR  */
+    KW_INT = 258,                  /* KW_INT  */
+    KW_REAL = 259,                 /* KW_REAL  */
+    VOID = 260,                    /* VOID  */
+    IF = 261,                      /* IF  */
+    ELSE = 262,                    /* ELSE  */
+    WHILE = 263,                   /* WHILE  */
     LOOP = 264,                    /* LOOP  */
     INPUT = 265,                   /* INPUT  */
-    IF = 266,                      /* IF  */
-    ELSE = 267,                    /* ELSE  */
-    WHILE = 268,                   /* WHILE  */
-    RETURN = 269,                  /* RETURN  */
-    EQ = 270,                      /* EQ  */
-    LEQ = 271,                     /* LEQ  */
-    LT = 272,                      /* LT  */
-    GT = 273,                      /* GT  */
-    GEQ = 274,                     /* GEQ  */
-    NEQ = 275,                     /* NEQ  */
-    PLUS = 276,                    /* PLUS  */
-    MINUS = 277,                   /* MINUS  */
-    TIMES = 278,                   /* TIMES  */
-    DIV = 279,                     /* DIV  */
-    MOD = 280,                     /* MOD  */
-    KW_CHAR = 281,                 /* KW_CHAR  */
-    KW_INT = 282,                  /* KW_INT  */
-    KW_REAL = 283                  /* KW_REAL  */
+    RETURN = 266,                  /* RETURN  */
+    EQ = 267,                      /* EQ  */
+    LEQ = 268,                     /* LEQ  */
+    LT = 269,                      /* LT  */
+    GT = 270,                      /* GT  */
+    GEQ = 271,                     /* GEQ  */
+    NEQ = 272,                     /* NEQ  */
+    LIT_INT = 273,                 /* LIT_INT  */
+    LIT_REAL = 274,                /* LIT_REAL  */
+    LIT_CHAR = 275,                /* LIT_CHAR  */
+    ID = 276                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -88,15 +81,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 19 "parser.y"
+#line 26 "parser.y"
 
     int intValue;
     float floatValue;
-    char* strValue;
-    Symbol* symbolEntry;
-    TAC* tac;        
+    char *strValue;
+    Symbol *symbolEntry;
+    int tipo;
 
-#line 100 "parser.tab.h"
+#line 93 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

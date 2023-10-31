@@ -21,7 +21,13 @@ int main(int argc, char **argv)
     yyin= file;
     yyparse();
     print_simboloTabela();
-    tac_print(lastTac);
+
+    // Supondo que você tenha uma forma de obter a AST gerada
+    AST* ast = getASTGenerated(); // Você precisa implementar essa função ou mecanismo
+    TAC* code = generateCode(ast);
+
+    // Imprime o código intermediário na saída padrão
+    printIntermediateCode(code);
   
     return 0;
 }

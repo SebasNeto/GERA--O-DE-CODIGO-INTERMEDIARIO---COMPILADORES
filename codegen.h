@@ -20,6 +20,35 @@ typedef enum {
     AST_IF,
     AST_IF_ELSE,
     AST_WHILE,
+    AST_PROGRAM,
+    AST_OP_REL,
+    AST_OP_SOMA,
+    AST_OP_MULT,
+    AST_VAR,
+    AST_LISTA_DECL,
+    AST_DECL,
+    AST_COM_COMP,
+    AST_LITERAL,
+    AST_FUNC_CALL,
+    AST_ARRAY_ACCESS,
+    AST_ARGS,
+    AST_LITERAL_INT,
+    AST_LITERAL_REAL,
+    AST_LITERAL_CHAR,
+    AST_FUNC_DECL,
+    AST_VAR_DECL,
+    AST_PARAMS,
+    AST_PARAMS_VOID,
+    AST_PARAMS_EMPTY,
+    AST_PARAM,
+    AST_DECL_LOCAIS,
+    AST_LISTA_COM,
+    AST_EXPR_EMPTY,
+    AST_RETURN
+    
+
+    
+
 } AST_TYPE;
 
 // Estrutura TAC - representa o código de 3 endereçõs 
@@ -43,6 +72,8 @@ typedef struct ast {
 
 extern int tempCounter;
 extern int labelCounter;
+extern AST* root;
+
 
 Symbol* makeConstant(int type, void* value);
 
@@ -54,7 +85,14 @@ extern TAC* lastTac;
 void tac_print(TAC *tac);
 Symbol* makeTemp();
 Symbol* makeLabel();
+Symbol* makeConstant(int type, void* value);
+
+AST* createASTNode(AST_TYPE type, Symbol* symbol, AST* left, AST* right, AST* middle) ;
 TAC* generateCode(AST* node);
+
+AST* getASTGenerated() ;
+
+void printIntermediateCode(TAC* code) ;
 
 
 #endif 

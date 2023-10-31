@@ -5,6 +5,7 @@
 #include "codegen.h"
 
 TAC* lastTac = NULL;
+AST* root = NULL;
 
 // cria um novo TAC com os simbolos e tipo 
 TAC* tac_create(TAC_TYPE type, Symbol* res, Symbol* op1, Symbol* op2) {
@@ -118,59 +119,23 @@ void tac_print(TAC *tac) {
 int tempCounter = 0;
 int labelCounter = 0;
 
-//cria um novo simbolo temporario 
+
 Symbol* makeTemp() {
     char buffer[256];
     sprintf(buffer, "__temp%d", tempCounter++);
-    printf("makeTemp: Gerando temp: %s\n", buffer); // <--- Print aqui
-    return inserirSimbolo(buffer, SYMBOL_SCALAR);
+    //printf("makeTemp: Gerando temp: %s\n", buffer); // <--- Print aqui
+    //return inserirSimbolo(buffer, SYMBOL_SCALAR);
+    return inserirSimbolo(SYMBOL_SCALAR, buffer);
 }
 
-//criar uma nova label
-//Symbol* makeLabel() {
-//    char buffer[256];
-//    sprintf(buffer, "__label%d", labelCounter++);
-//    return inserirSimbolo(buffer, SYMBOL_LABEL);
-//}
-
-//Symbol* makeLabel() {
-//    char buffer[256];
-//    sprintf(buffer, "__label%d", labelCounter);
-//    printf("Gerando label: %s\n", buffer);
-//    labelCounter++;
-//    return inserirSimbolo(buffer, SYMBOL_LABEL);
-//}
 Symbol* makeLabel() {
     char buffer[256];
     sprintf(buffer, "__label%d", labelCounter);
     printf("makeLabel: Gerando label: %s\n", buffer); // <--- Print aqui
     labelCounter++;
-    return inserirSimbolo(buffer, SYMBOL_LABEL);
+    //return inserirSimbolo(buffer, SYMBOL_LABEL);
+    return inserirSimbolo(SYMBOL_LABEL, buffer);
 }
-
-
-//cria um novo simbolo constante
-// Symbol* makeConstant(int type, void* value) {
-//     char buffer[256];
-    
-//     if (type == TYPE_INT) {
-//         int intValue = *(int*)value;
-//         snprintf(buffer, sizeof(buffer), "%d", intValue);
-//     } else if (type == TYPE_FLOAT) {
-//         float floatValue = *(float*)value;
-//         snprintf(buffer, sizeof(buffer), "%.2f", floatValue); 
-//     } else {
-
-//         return NULL;
-//     }
-
-//     Symbol* sym = retornaSimbolo(buffer);
-//     if (!sym) {
-//         sym = inserirSimbolo(buffer, SYMBOL_SCALAR);  
-//     }
-    
-//     return sym;
-// }
 
 Symbol* makeConstant(int type, void* value) {
     char buffer[256];
@@ -178,20 +143,21 @@ Symbol* makeConstant(int type, void* value) {
     if (type == TYPE_INT) {
         int intValue = *(int*)value;
         snprintf(buffer, sizeof(buffer), "%d", intValue);
-        printf("makeConstant: Gerando constante INT: %s\n", buffer); // <--- Print aqui
+        //printf("makeConstant: Gerando constante INT: %s\n", buffer); // <--- Print aqui
     } else if (type == TYPE_FLOAT) {
         float floatValue = *(float*)value;
         snprintf(buffer, sizeof(buffer), "%.2f", floatValue);
-        printf("makeConstant: Gerando constante FLOAT: %s\n", buffer); // <--- Print aqui
+        //printf("makeConstant: Gerando constante FLOAT: %s\n", buffer); // <--- Print aqui
     } else {
-        printf("makeConstant: Tipo desconhecido!\n"); // <--- Print aqui
+        //printf("makeConstant: Tipo desconhecido!\n"); // <--- Print aqui
         return NULL;
     }
 
     Symbol* sym = retornaSimbolo(buffer);
     if (!sym) {
-        printf("makeConstant: Símbolo não encontrado. Inserindo novo símbolo: %s\n", buffer); // <--- Print aqui
-        sym = inserirSimbolo(buffer, SYMBOL_SCALAR);  
+        //printf("makeConstant: Símbolo não encontrado. Inserindo novo símbolo: %s\n", buffer); // <--- Print aqui
+        //sym = inserirSimbolo(buffer, SYMBOL_SCALAR); 
+        sym = inserirSimbolo(SYMBOL_SCALAR, buffer); 
     } else {
         printf("makeConstant: Símbolo já existe: %s\n", buffer); // <--- Print aqui
     }
@@ -199,6 +165,22 @@ Symbol* makeConstant(int type, void* value) {
     return sym;
 }
 
+// Função para criar um nó da AST
+AST* createASTNode(AST_TYPE type, Symbol* symbol, AST* left, AST* right, AST* middle) {
+    AST* newNode = (AST*)malloc(sizeof(AST));
+    if (!newNode) {
+        fprintf(stderr, "Erro ao alocar memória para o nó da AST.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    newNode->type = type;
+    newNode->symbol = symbol;
+    newNode->filhoAEsquerda = left;
+    newNode->filhoADireita = right;
+    newNode->filhoMeio = middle;
+
+    return newNode;
+}
 
 //função principal para gerar o código intermediario 
 //processa recursivamente um nodo da AST e retorna o código TAC correspondente
@@ -253,3 +235,17 @@ TAC* generateCode(AST* node) {
             return NULL;
     }
 }
+
+AST* getASTGenerated() {
+    return root;
+}
+
+
+void printIntermediateCode(TAC* code) {
+    TAC* current = code;
+    while (current != NULL) {
+        tac_print(current);
+        current = current->tacAnterior;
+    }
+}
+
