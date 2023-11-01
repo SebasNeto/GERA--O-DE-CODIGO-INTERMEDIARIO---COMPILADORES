@@ -5,6 +5,8 @@
 #define SYMBOL_LABEL  2
 #define TABLE_SIZE 100
 
+#include "codegen.h"
+
 //Representa um símbolo na tabela de símbolos.
 typedef struct symbol {
     char* identifier;

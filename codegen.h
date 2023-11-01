@@ -4,8 +4,7 @@
 #define CODEGEN_H
 
 #include "tabelaSimbolos.h"
-
-extern ASTNode* ast_root;
+#include "ast.h"
 
 ////////////////// ESTRUTURA TACS //////////////////
 typedef enum {
@@ -23,22 +22,6 @@ typedef struct tac {
     struct tac *next;
 } TAC;
 
-typedef enum {
-    AST_ADD, AST_SUB, AST_MUL, AST_DIV, // Operadores aritméticos
-    AST_LIT_INT, AST_LIT_REAL, AST_LIT_CHAR, // Literais
-    AST_ID,AST_PROGRAM, AST_ASSIGN, // Identificador
-    AST_LEQ, AST_LT, AST_GT, AST_GEQ, AST_EQ, AST_NEQ,
-    AST_DECL_VAR
-} ASTType;
-
-typedef struct ASTNode {
-    ASTType type;
-    struct ASTNode *left;
-    struct ASTNode *right;
-    Symbol *symbol;
-} ASTNode;
-
-
 
 TAC* tac_create(TACType type, Symbol *res, Symbol *op1, Symbol *op2);
 void tac_print(TAC *tac);
@@ -50,12 +33,6 @@ Symbol* make_temp();
 Symbol* make_label();
 
 //////////////Q ESTRUTURA AST /////////////
-
-
-
-ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol);
-void ast_free(ASTNode *node);
-
 /////////////// GERAÇÃO CÓDIGO INTERMEDIÁRIO /////////////////////
 
 TAC* generate_code(ASTNode *node);

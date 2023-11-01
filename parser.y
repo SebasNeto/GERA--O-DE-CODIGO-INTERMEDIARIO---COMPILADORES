@@ -3,13 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lex.yy.h"
-
-ASTNode* ast_root = NULL;
-#include "codegen.h"
 #include "tabelaSimbolos.h"
-
-
+#include "ast.h"
+#include "codegen.h"
+#include "lex.yy.h"
 
 extern int yylex();
 extern char* yytext;

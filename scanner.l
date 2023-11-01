@@ -2,8 +2,10 @@
 
 #include <stdio.h>
 
-#include "codegen.h"
 #include "tabelaSimbolos.h"
+#include "ast.h"
+#include "codegen.h"
+
 #include "parser.tab.h"
 
 

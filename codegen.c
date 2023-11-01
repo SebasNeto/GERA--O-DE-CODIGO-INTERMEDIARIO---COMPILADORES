@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "codegen.h"
 #include "tabelaSimbolos.h"
-
-
-ASTNode* ast_root;
+#include "ast.h"
+#include "codegen.h"
 
 ////////////////// ESTRUTURA TACS //////////////////
 

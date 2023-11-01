@@ -1,22 +1,20 @@
 #include <stdio.h>
-#include "parser.tab.h"
-#include "tabelaSimbolos.h"
-#include "codegen.h"
- 
 
+#include "tabelaSimbolos.h"
+#include "ast.h"
+#include "codegen.h"
+
+#include "parser.tab.h"
 
 extern int yydebug;
 extern FILE *yyin;
 extern FILE *yyout;
-
-ASTNode* ast_root = NULL;
 
 int main(int argc, char **argv)
 {
     iniciarTabela();
     
     FILE *file;
-    yyin = file;
     yyout = fopen("symbol_table.lex", "w+");
 
     int yydebug = 1;

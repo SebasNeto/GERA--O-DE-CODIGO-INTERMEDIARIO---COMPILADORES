@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
 #include "tabelaSimbolos.h"
-
-
+#include "codegen.h" 
 
 Symbol* simboloTabela[TABLE_SIZE];
 
