@@ -3,9 +3,7 @@
 #ifndef AST_H
 #define AST_H
 
-#include "tabelaSimbolos.h"
-
-extern ASTNode* ast_root;
+typedef struct symbol Symbol;
 
 typedef enum {
     AST_ADD, AST_SUB, AST_MUL, AST_DIV, // Operadores aritméticos
@@ -26,6 +24,7 @@ typedef struct ASTNode {
     Symbol *symbol;
 } ASTNode;
 
+extern ASTNode* ast_root;
 ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol);
 void ast_free(ASTNode *node);
 

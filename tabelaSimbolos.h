@@ -1,11 +1,13 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+#include "codegen.h"
+
 #define SYMBOL_SCALAR 1
 #define SYMBOL_LABEL  2
 #define TABLE_SIZE 100
 
-#include "codegen.h"
+typedef struct ASTNode ASTNode;
 
 //Representa um símbolo na tabela de símbolos.
 typedef struct symbol {
