@@ -1,10 +1,12 @@
 %{
-   
-#include "tabelaSimbolos.h"
-#include "codegen.h"
-#include "parser.tab.h"
 
 #include <stdio.h>
+
+#include "codegen.h"
+#include "tabelaSimbolos.h"
+#include "parser.tab.h"
+
+
 void yyerror(const char *s);
 %}
 

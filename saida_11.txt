@@ -1,0 +1,36 @@
+TOKEN: KW_INT
+Símbolo inserido: a
+ID: a
+TOKEN: =
+Símbolo inserido: a
+TOKEN: LIT_INT 5
+Símbolo inserido: 5
+TOKEN: ;
+TOKEN: KW_INT
+Símbolo inserido: b
+ID: b
+TOKEN: =
+Símbolo inserido: b
+TOKEN: LIT_INT 10
+Símbolo inserido: 10
+TOKEN: ;
+TOKEN: KW_INT
+Símbolo inserido: c
+ID: c
+TOKEN: ;
+Símbolo inserido: c
+ID: c
+TOKEN: =
+ID: a
+TOKEN: +
+ID: b
+TOKEN: ;
+Tabela de Símbolos:
+Slot 53: ID = 5, Tipo = 1
+Slot 61: ID = 10, Tipo = 1
+Slot 97: ID = a, Tipo = 0
+Slot 97: ID = a, Tipo = 1
+Slot 98: ID = b, Tipo = 0
+Slot 98: ID = b, Tipo = 1
+Slot 99: ID = c, Tipo = 0
+Slot 99: ID = c, Tipo = 1

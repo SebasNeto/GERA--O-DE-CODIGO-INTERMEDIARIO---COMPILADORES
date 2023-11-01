@@ -1,10 +1,11 @@
 // simboloTabela.c
 
-#include "tabelaSimbolos.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "tabelaSimbolos.h"
+
+
 
 Symbol* simboloTabela[TABLE_SIZE];
 
@@ -33,8 +34,8 @@ Symbol* inserirSimbolo( int type, char* identifier) {
     Symbol* novoSimbolo = (Symbol*) malloc(sizeof(Symbol));
     novoSimbolo->identifier = strdup(identifier);
     novoSimbolo->type = type;
-    novoSimbolo->scope = 0;  // padrão para global; altere conforme necessário
-    novoSimbolo->offset = 0; // a ser determinado posteriormente
+    novoSimbolo->scope = 0;  
+    novoSimbolo->offset = 0; 
     novoSimbolo->nParams = 0;
     novoSimbolo->paramsList = NULL;
     novoSimbolo->label = NULL;
@@ -105,4 +106,3 @@ void print_simboloTabela() {
         }
     }
 }
-

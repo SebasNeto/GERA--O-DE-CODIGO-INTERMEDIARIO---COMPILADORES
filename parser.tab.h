@@ -81,15 +81,16 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "parser.y"
+#line 29 "parser.y"
 
     int intValue;
     float floatValue;
     char *strValue;
     Symbol *symbolEntry;
     int tipo;
+    ASTNode* astNode;
 
-#line 93 "parser.tab.h"
+#line 94 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

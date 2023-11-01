@@ -1,12 +1,15 @@
 #include <stdio.h>
+#include "parser.tab.h"
 #include "tabelaSimbolos.h"
 #include "codegen.h"
-#include "parser.tab.h"
  
+
 
 extern int yydebug;
 extern FILE *yyin;
 extern FILE *yyout;
+
+ASTNode* ast_root = NULL;
 
 int main(int argc, char **argv)
 {
@@ -22,12 +25,11 @@ int main(int argc, char **argv)
     yyparse();
     print_simboloTabela();
 
-    // Supondo que você tenha uma forma de obter a AST gerada
-    AST* ast = getASTGenerated(); // Você precisa implementar essa função ou mecanismo
-    TAC* code = generateCode(ast);
 
-    // Imprime o código intermediário na saída padrão
-    printIntermediateCode(code);
+    if (ast_root != NULL) {
+        generate_code(ast_root);  // Chama a função de geração de código
+    }
+
   
     return 0;
 }
