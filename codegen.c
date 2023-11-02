@@ -7,28 +7,22 @@
 #include "ast.h"
 #include "codegen.h"
 
-////////////////// ESTRUTURA TACS //////////////////
+///////////////////////////////// ESTRUTURAS TACS //////////////////////////////////////
 
-TAC* tac_create(TACType type, Symbol *res, Symbol *op1, Symbol *op2) {
-    TAC *newtac = (TAC*)malloc(sizeof(TAC));
-    newtac->type = type;
-    newtac->res = res;
-    newtac->op1 = op1;
-    newtac->op2 = op2;
-    newtac->prev = NULL;
-    newtac->next = NULL;
-    return newtac;
+//FUNÇÃO QUE CRIA UM NOVO CÓDIGO DE 3 ENDEREÇOS
+TAC* criarTac(TACType type, Symbol *res, Symbol *op1, Symbol *op2) {
+    TAC *novoTac = (TAC*)malloc(sizeof(TAC));
+    novoTac->type = type;
+    novoTac->res = res;
+    novoTac->op1 = op1;
+    novoTac->op2 = op2;
+    novoTac->prev = NULL;
+    novoTac->next = NULL;
+    return novoTac;
 }
 
-void tac_print(TAC *tac) {
-    if (!tac) return;
-    printf("TAC(%d): %s, %s, %s\n", tac->type,
-           tac->res ? tac->res->identifier : "NULL",
-           tac->op1 ? tac->op1->identifier : "NULL",
-           tac->op2 ? tac->op2->identifier : "NULL");
-}
-
-TAC* tac_join(TAC *l1, TAC *l2) {
+//FUNÇÃO QUE UNE DUAS LISTAS TAC'S 
+TAC* uneTacs(TAC *l1, TAC *l2) {
     TAC *p;
     if (!l1) return l2;
     if (!l2) return l1;
@@ -40,17 +34,19 @@ TAC* tac_join(TAC *l1, TAC *l2) {
 }
 
 
-///////////////////CRIAÇÃO DE SIMBOLOS TEMPORARIOS E LABELS /////////////////////
+///////////////////// CRIAÇÃO DE SIMBOLOS TEMPORARIOS E LABELS /////////////////////
 
 static int tempCount = 0;
 static int labelCount = 0;
 
+//FUNÇÃO QUE CRIA UM SIMBOLO TEMPORÁRIO COM UM NOME ÚNICO
 Symbol* make_temp() {
     char tempName[20];
     sprintf(tempName, "__temp%d", tempCount++);
     return inserirSimbolo(SYMBOL_SCALAR, tempName);
 }
 
+//FUNÇÃO QUE CRIA UM NOVO ROTULO COM UM NOME ÚNICO
 Symbol* make_label() {
     char labelName[20];
     sprintf(labelName, "__label%d", labelCount++);
@@ -58,42 +54,99 @@ Symbol* make_label() {
 }
 
 
-TAC* generate_code(ASTNode *node) {
-    if (!node) return NULL;
+/////////////////////////// ESTRUTURAS PARA GERAÇÃO DO CÓDIGO INTERMEDIÁRIO ///////////////
+
+//FUNÇÃO RESPONSÁVEL POR GERAR O CÓDIGO INTERMEDIÁRIO
+TAC* gerarCodigo(ASTNode *node) {
+
+    if (!node){
+        fprintf(stderr,"Erro: Nó vazio!\n");
+        return NULL;
+    }
 
     TAC *code1, *code2, *result;
 
     switch (node->type) {
         case AST_SYMBOL:
-            return tac_create(TAC_SYMBOL, node->symbol, NULL, NULL);
+            printf("Depuração: Nó AST_SYMBOL encontrado.\n");
+            if (!node->symbol) return NULL;
+            return criarTac(TAC_SYMBOL, node->symbol, NULL, NULL);
 
         case AST_ADD:
-            code1 = generate_code(node->left);
-            code2 = generate_code(node->right);
-            result = tac_create(TAC_ADD, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
-            return tac_join(tac_join(code1, code2), result);
+            printf("Depuração: Nó AST_ADD encontrado.\n");
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            if (!code1 || !code2) return NULL;
+            result = criarTac(TAC_ADD, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
+            return uneTacs(uneTacs(code1, code2), result);
 
         case AST_SUB:
-            code1 = generate_code(node->left);
-            code2 = generate_code(node->right);
-            result = tac_create(TAC_SUB, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
-            return tac_join(tac_join(code1, code2), result);
+             printf("Depuração: Nó AST_SUB encontrado.\n");
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            if (!code1 || !code2) return NULL;
+            result = criarTac(TAC_SUB, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
+            return uneTacs(uneTacs(code1, code2), result);
 
-        // Outros casos como AST_MUL, AST_DIV, etc.
 
         case AST_IF:
-            code1 = generate_code(node->left); // Condição IF
-            code2 = generate_code(node->right); // Corpo do IF
+            printf("Depuração: Nó AST_IF encontrado.\n");
+            code1 = gerarCodigo(node->left); // Condição IF
+            code2 = gerarCodigo(node->right); // Corpo do IF
+            if (!code1 || !code2) return NULL;
             Symbol *label = make_label();
-            TAC *jumpIfFalse = tac_create(TAC_IFZ, label, code1 ? code1->res : NULL, NULL);
-            TAC *labelTac = tac_create(TAC_LABEL, label, NULL, NULL);
-            return tac_join(tac_join(tac_join(code1, jumpIfFalse), code2), labelTac);
-
-        // Outros casos como AST_WHILE, AST_ASSIGN, etc.
+            TAC *jumpIfFalse = criarTac(TAC_IFZ, label, code1 ? code1->res : NULL, NULL);
+            TAC *labelTac = criarTac(TAC_LABEL, label, NULL, NULL);
+            return uneTacs(uneTacs(uneTacs(code1, jumpIfFalse), code2), labelTac);
 
         default:
             printf("Tipo de nó AST não reconhecido: %d\n", node->type);
+            printf("Endereço do símbolo não reconhecido: %p\n", (void*)node->symbol);
             return NULL;
     }
 }
 
+//FUNÇÃO QUE ITERA NA LISTA DE TACS'S E IMPRIME
+void printTacCode(TAC* tac) {
+    printf("Código Intermediário TAC:\n");
+    while (tac != NULL) {
+        tacPrint(tac);
+        tac = tac->next;
+    }
+}
+
+//FUNÇÃO RESPONSÁVEL POR IMPRIMIR TAC'S DISPÓNIVEIS 
+void tacPrint(TAC* tac) {
+    if (!tac) return;
+
+    printf("TAC: ");
+
+    switch (tac->type) {
+        case TAC_SYMBOL: printf("TAC_SYMBOL, "); break;
+        case TAC_MOVE: printf("TAC_MOVE, "); break;
+        case TAC_ADD: printf("TAC_ADD, "); break;
+        case TAC_SUB: printf("TAC_SUB, "); break;
+        case TAC_MUL: printf("TAC_MUL, "); break;
+        case TAC_DIV: printf("TAC_DIV, "); break;
+        case TAC_LABEL: printf("TAC_LABEL, "); break;
+        case TAC_BEGINFUN: printf("TAC_BEGINFUN, "); break;
+        case TAC_ENDFUN: printf("TAC_ENDFUN, "); break;
+        case TAC_IFZ: printf("TAC_IFZ, "); break;
+        case TAC_JUMP: printf("TAC_JUMP, "); break;
+        case TAC_CALL: printf("TAC_CALL, "); break;
+        case TAC_ARG: printf("TAC_ARG, "); break;
+        case TAC_RET: printf("TAC_RET, "); break;
+        case TAC_PRINT: printf("TAC_PRINT, "); break;
+        case TAC_READ: printf("TAC_READ, "); break;
+        default: printf("UNKNOWN, ");
+    }
+
+    // Imprimir o resultado
+    if (tac->res) printf("Resultado: %s, ", tac->res->identifier);
+
+    // Imprimir os operandos
+    if (tac->op1) printf("Operando 1: %s, ", tac->op1->identifier);
+    if (tac->op2) printf("Operando 2: %s, ", tac->op2->identifier);
+
+    printf("\n");
+}

@@ -9,14 +9,17 @@
 
 Symbol* simboloTabela[TABLE_SIZE];
 
-//slot NULL
+/////////////////////////////////////////////////// ESTRUTURA TABELA DE SIMBOLOS /////////////////////////////////////////////////
+
+
+//FUNÇÃO RESPONSÁVEL POR INICIAR A TABELA DE SIMBOLOS - CHAMADA NA MAIN
 void iniciarTabela() {
     for(int i = 0; i < TABLE_SIZE; i++) {
         simboloTabela[i] = NULL;
     }
 }
 
-//Calcula um valor de hash para um identificador fornecido.
+//FUNÇÃO QUE CALCULA UM VALOR DE HASH PARA UM IDENTIFICADOR
 unsigned int hash(char* key) {
     unsigned int valor = 0;
     for (char* p = key; *p != '\0'; p++) {
@@ -25,12 +28,10 @@ unsigned int hash(char* key) {
     return valor % TABLE_SIZE;
 }
 
-//Insere um novo símbolo na tabela de símbolos
+//FUNÇÃO QUE INSERE UM NOVO SIMBOLO NA TABELA 
 Symbol* inserirSimbolo( int type, char* identifier) {
 
     unsigned int slot = hash(identifier);
-    //printf("Inserindo símbolo: %s\n", identifier);
-    //printf("Inserindo símbolo na tabela a partir de: %s, função: %s(), linha: %d\n", __FILE__, __func__, __LINE__);
     Symbol* novoSimbolo = (Symbol*) malloc(sizeof(Symbol));
     novoSimbolo->identifier = strdup(identifier);
     novoSimbolo->type = type;
@@ -60,7 +61,7 @@ Symbol* inserirSimbolo( int type, char* identifier) {
     return novoSimbolo;
 }
 
-//Procura um identificador na tabela de símbolos e retorna o símbolo correspondente
+//FUNÇÃO QUE PROCURA UM SIMBOLO NA TABELA USANDO UM ID
 Symbol* retornaSimbolo(char* identifier) {
     unsigned int slot = hash(identifier);
     Symbol* linhaCorrente = simboloTabela[slot];
@@ -73,7 +74,7 @@ Symbol* retornaSimbolo(char* identifier) {
     return NULL;
 }
 
-// Remove um símbolo específico da tabela.
+//FUNÇÃO QUE REMOVE UM SIBOLO ESPECIFICO DA TABELA DE SIMBOLOS
 void removerSimbolo(char* identifier) {
     unsigned int slot = hash(identifier);
     Symbol* anterior = NULL;
@@ -95,7 +96,7 @@ void removerSimbolo(char* identifier) {
     }
 }
 
-// Imprime o conteúdo da tabela de símbolos.
+//FUNÇÃO QUE IMPRIME O CONTEÚDO DA TABELA DE SIMBOLOS
 void print_simboloTabela() {
     printf("Tabela de Símbolos:\n");
     for (int i = 0; i < TABLE_SIZE; i++) {

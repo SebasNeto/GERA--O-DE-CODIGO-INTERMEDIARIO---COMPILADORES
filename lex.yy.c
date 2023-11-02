@@ -936,7 +936,7 @@ case 22:
 YY_RULE_SETUP
 #line 50 "scanner.l"
 {
-   yylval.floatValue = atof(yytext);   // nota que a estrutura yylval deve ter um campo chamado floatValue
+   yylval.floatValue = atof(yytext); 
    printf("TOKEN: LIT_REAL %s\n", yytext); 
    return LIT_REAL; 
 }

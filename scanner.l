@@ -48,7 +48,7 @@ void yyerror(const char *s);
 }
 
 [0-9]+[.][0-9]+ {
-   yylval.floatValue = atof(yytext);   // nota que a estrutura yylval deve ter um campo chamado floatValue
+   yylval.floatValue = atof(yytext); 
    printf("TOKEN: LIT_REAL %s\n", yytext); 
    return LIT_REAL; 
 }

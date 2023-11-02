@@ -1,17 +1,25 @@
-Erro sintático na linha 4, próximo ao token a
 TOKEN: KW_INT
+Símbolo inserido: a
 ID: a
 TOKEN: =
 TOKEN: LIT_INT 5
+Símbolo inserido: 5
 TOKEN: ;
+Símbolo inserido: a
 TOKEN: KW_INT
+Símbolo inserido: b
 ID: b
 TOKEN: =
 TOKEN: LIT_INT 10
+Símbolo inserido: 10
 TOKEN: ;
-TOKEN: KW_INT
-ID: c
-TOKEN: ;
-ID: c
-TOKEN: =
-ID: a
+Símbolo inserido: b
+Tabela de Símbolos:
+Slot 53: ID = 5, Tipo = 1
+Slot 61: ID = 10, Tipo = 1
+Slot 97: ID = a, Tipo = 0
+Slot 97: ID = a, Tipo = 19
+Slot 98: ID = b, Tipo = 0
+Slot 98: ID = b, Tipo = 19
+AST construída com sucesso. Gerando código intermediário...
+Tipo de nó AST não reconhecid

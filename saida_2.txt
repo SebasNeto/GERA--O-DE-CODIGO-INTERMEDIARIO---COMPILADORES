@@ -1,25 +1,25 @@
-Erro sintático na linha 3, próximo ao token ;
 TOKEN: KW_INT
+Símbolo inserido: a
 ID: a
 TOKEN: =
 TOKEN: LIT_INT 5
+Símbolo inserido: 5
 TOKEN: ;
+Símbolo inserido: a
 TOKEN: KW_INT
+Símbolo inserido: b
 ID: b
 TOKEN: =
 TOKEN: LIT_INT 10
+Símbolo inserido: 10
 TOKEN: ;
-TOKEN: KW_INT
-ID: c
-TOKEN: ;
+Símbolo inserido: b
 Tabela de Símbolos:
-Slot 7: ID =  �£�U, Tipo = 1
-Slot 13: ID = @�£�U, Tipo = 1
-Slot 44: ID = __temp0, Tipo = 1
-Slot 45: ID = __temp1, Tipo = 1
 Slot 53: ID = 5, Tipo = 1
 Slot 61: ID = 10, Tipo = 1
 Slot 97: ID = a, Tipo = 0
+Slot 97: ID = a, Tipo = 19
 Slot 98: ID = b, Tipo = 0
-Slot 99: ID = c, Tipo = 0
-TAC (MOVE): __temp1 = 10
+Slot 98: ID = b, Tipo = 19
+AST construída com sucesso. Gerando código intermediário...
+Depuração: Processando nó AS

@@ -78,16 +78,16 @@ void yyerror(const char *s);
 
 programa: 
     lista_decl lista_com{
-        ast_root = ast_create_node(AST_PROGRAM, $1, $2, NULL);
+        astRaiz = criarNoAST(AST_PROGRAM, $1, $2, NULL);
     }
     ;
 
 lista_decl:
     lista_decl decl {
-        $$ = ast_create_node(AST_LIST_DECL, $1, $2, NULL);
+        $$ = criarNoAST(AST_LIST_DECL, $1, $2, NULL);
     }
     | decl {
-        $$ = ast_create_node(AST_DECL, $1, NULL, NULL);
+        $$ = criarNoAST(AST_DECL, $1, NULL, NULL);
     }
     ;
 
@@ -98,38 +98,40 @@ decl:
 
 decl_var:
     espec_tipo ID ';' {
-        Symbol* entry = inserirSimbolo( $2->type, $1->symbol->identifier);
-        $$ = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
+        Symbol* entry = inserirSimbolo($1->type, $2->identifier);
+        $$ = criarNoAST(AST_DECL_VAR, NULL, NULL, entry);
     }
     | espec_tipo ID '=' literais ';' {
-        Symbol* entry = inserirSimbolo($2->type, $1->symbol->identifier);
-        $$ = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
+        Symbol* entry = inserirSimbolo($1->type, $2->identifier);
+        $$ = criarNoAST(AST_DECL_VAR, NULL, NULL, entry);
     }
     ;
 
 
+
 espec_tipo:
-    KW_INT { $$ = ast_create_node(AST_TYPE_INT, NULL, NULL, NULL); }
-    | KW_REAL { $$ = ast_create_node(AST_TYPE_REAL, NULL, NULL, NULL); }
-    | VOID { $$ = ast_create_node(AST_TYPE_VOID, NULL, NULL, NULL); }
+    KW_INT { $$ = criarNoAST(AST_TYPE_INT, NULL, NULL, NULL); }
+    | KW_REAL { $$ = criarNoAST(AST_TYPE_REAL, NULL, NULL, NULL); }
+    | VOID { $$ = criarNoAST(AST_TYPE_VOID, NULL, NULL, NULL); }
     ;
 
 
 decl_func:
     espec_tipo ID '(' params ')' com_comp {
-        if ($1 == NULL || $2 == NULL) {
-            yyerror("Erro: símbolo nulo detectado na declaração da função");
-            YYABORT;
+        if ($1 && $1->symbol && $2 && $2->type) {
+            Symbol* entry = inserirSimbolo($2->type, $1->symbol->identifier);
+            $$ = criarNoAST(AST_FUNC_DECL, NULL, NULL, entry);
+        } else {
+            yyerror("Erro na declaração da função: símbolo nulo detectado.");
+            $$ = NULL;
         }
-        Symbol* entry = inserirSimbolo($2->type, $1->symbol->identifier);
-        $$ = ast_create_node(AST_FUNC_DECL, NULL, NULL, entry);
     }
     ;
 
 
 params:
     lista_param { $$ = $1; }
-    | VOID { $$ = ast_create_node(AST_TYPE_VOID, NULL, NULL, NULL); }
+    | VOID { $$ = criarNoAST(AST_TYPE_VOID, NULL, NULL, NULL); }
     | /* vazio */ { $$ = NULL; }
     ;
 
@@ -150,7 +152,7 @@ decl_locais:
 
 lista_com:
     comando lista_com {
-        $$ = ast_create_node(AST_LIST_COM, $1, $2, NULL);
+        $$ = criarNoAST(AST_LIST_COM, $1, $2, NULL);
     }
     | /* vazio */ {
         $$ = NULL;
@@ -168,10 +170,10 @@ comando:
 
 com_expr:
     exp ';' {
-        $$ = ast_create_node(AST_EXPR, $1, NULL, NULL); // Ajuste conforme necessário
+        $$ = criarNoAST(AST_EXPR, $1, NULL, NULL);
     }
     | ';' {
-        $$ = ast_create_node(AST_EMPTY, NULL, NULL, NULL); // Representa um comando vazio
+        $$ = criarNoAST(AST_EMPTY, NULL, NULL, NULL);
     }
     ;
 
@@ -182,60 +184,60 @@ com_atrib:
         if (!varEntry) {
             yyerror("Variável não declarada");
         }else{
-            $$ = ast_create_node(AST_ASSIGN, $1, $3, NULL);
+            $$ = criarNoAST(AST_ASSIGN, $1, $3, NULL);
         }
     }
     ;
 
 com_comp:
     '{' decl_locais lista_com '}' {
-        $$ = ast_create_node(AST_COMPOUND, $2, $3, NULL); // Ajuste conforme necessário
+        $$ = criarNoAST(AST_COMPOUND, $2, $3, NULL);
     }
     ;
 
 com_selecao:
     IF '(' exp ')' comando {
-        $$ = ast_create_node(AST_IF, $3, $5, NULL); // Sem parte "else"
+        $$ = criarNoAST(AST_IF, $3, $5, NULL);
     }
     | IF '(' exp ')' com_comp ELSE comando {
-        $$ = ast_create_node(AST_IF_ELSE, $3, $5, retornaSimbolo("AST_IF_ELSE"));
+        $$ = criarNoAST(AST_IF_ELSE, $3, $5, retornaSimbolo("AST_IF_ELSE"));
     }
     ;
 
 com_repeticao:
     WHILE '(' exp ')' comando {
-        $$ = ast_create_node(AST_WHILE, $3, $5, NULL); 
+        $$ = criarNoAST(AST_WHILE, $3, $5, NULL); 
     }
     ;
 
 com_retorno:
     RETURN ';' {
-        $$ = ast_create_node(AST_RETURN, NULL, NULL, NULL); 
+        $$ = criarNoAST(AST_RETURN, NULL, NULL, NULL); 
     }
     | RETURN exp ';' {
-        $$ = ast_create_node(AST_RETURN, $2, NULL, NULL); 
+        $$ = criarNoAST(AST_RETURN, $2, NULL, NULL); 
     }
     ;
 
 exp:
     exp_soma op_relac exp_soma {
-        $$ = ast_create_node($2->type, $1, $3, NULL);
+        $$ = criarNoAST($2->type, $1, $3, NULL);
     }
     | exp_soma { $$ = $1; }
     ;
 
 op_relac:
-    LEQ { $$  = ast_create_node(AST_LEQ, NULL, NULL, NULL); }
-    | LT { $$  = ast_create_node(AST_LT, NULL, NULL, NULL); }
-    | GT { $$  = ast_create_node(AST_GT, NULL, NULL, NULL); }
-    | GEQ { $$  = ast_create_node(AST_GEQ, NULL, NULL, NULL); }
-    | EQ { $$  = ast_create_node(AST_EQ, NULL, NULL, NULL); }
-    | NEQ { $$  = ast_create_node(AST_NEQ, NULL, NULL, NULL); }
+    LEQ { $$  = criarNoAST(AST_LEQ, NULL, NULL, NULL); }
+    | LT { $$  = criarNoAST(AST_LT, NULL, NULL, NULL); }
+    | GT { $$  = criarNoAST(AST_GT, NULL, NULL, NULL); }
+    | GEQ { $$  = criarNoAST(AST_GEQ, NULL, NULL, NULL); }
+    | EQ { $$  = criarNoAST(AST_EQ, NULL, NULL, NULL); }
+    | NEQ { $$  = criarNoAST(AST_NEQ, NULL, NULL, NULL); }
     ;
 
 exp_soma:
-    exp_soma '+' exp_mult { $$ = ast_create_node(AST_ADD, $1, $3, NULL); }
-    | exp_soma '-' exp_mult { $$ = ast_create_node(AST_SUB, $1, $3, NULL); }
+    exp_soma '+' exp_mult { $$ = criarNoAST(AST_ADD, $1, $3, NULL); }
+    | exp_soma '-' exp_mult { $$ = criarNoAST(AST_SUB, $1, $3, NULL); }
     | exp_mult { $$ = $1; }
     ;
 
@@ -245,8 +247,8 @@ op_soma:
     ;
 
 exp_mult:
-    exp_mult '*' exp_simples { $$ = ast_create_node(AST_MUL, $1, $3, NULL); }
-    | exp_mult '/' exp_simples { $$ = ast_create_node(AST_DIV, $1, $3, NULL); }
+    exp_mult '*' exp_simples { $$ = criarNoAST(AST_MUL, $1, $3, NULL); }
+    | exp_mult '/' exp_simples { $$ = criarNoAST(AST_DIV, $1, $3, NULL); }
     | exp_simples { $$ = $1; }
     ;
 
@@ -264,9 +266,9 @@ exp_simples:
     ;
 
 literais:
-    LIT_INT { $$ = ast_create_node(AST_LIT_INT, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
-    | LIT_REAL { $$ = ast_create_node(AST_LIT_REAL, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
-    | LIT_CHAR { $$ = ast_create_node(AST_LIT_CHAR, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+    LIT_INT { $$ = criarNoAST(AST_LIT_INT, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+    | LIT_REAL { $$ = criarNoAST(AST_LIT_REAL, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+    | LIT_CHAR { $$ = criarNoAST(AST_LIT_CHAR, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
     ;
 
 cham_func:
@@ -279,11 +281,10 @@ var:
         if (!sym) {
             yyerror("Variável não declarada");
         } else {
-            $$ = ast_create_node(AST_ID, NULL, NULL, sym);
+            $$ = criarNoAST(AST_ID, NULL, NULL, sym);
         }
     }
     | ID '[' LIT_INT ']' {
-        // Tratamento de arrays, se necessário
     }
     ;
 

@@ -19,10 +19,7 @@ int main(int argc, char **argv)
     FILE *saida;
 
     yyout = fopen("symbol_table.lex", "w+");
-    saida = fopen("saida.txt", "w+");
-    
-    stderr = saida;
-    
+
 
     int yydebug = 1;
     file = fopen(argv[1], "r");
@@ -31,8 +28,13 @@ int main(int argc, char **argv)
     print_simboloTabela();
 
 
-    if (ast_root != NULL) {
-        generate_code(ast_root);  // Chama a função de geração de código
+    if (astRaiz != NULL) {
+        printf("AST construída com sucesso. Gerando código intermediário...\n");
+        TAC* code = gerarCodigo(astRaiz);
+        printTacCode(code);
+        tacPrint(code);
+    }else{
+        printf("Erro na compilação do AST.\n");
     }
 
 

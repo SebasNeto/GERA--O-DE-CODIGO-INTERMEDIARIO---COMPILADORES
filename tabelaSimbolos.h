@@ -9,7 +9,7 @@
 
 typedef struct ASTNode ASTNode;
 
-//Representa um símbolo na tabela de símbolos.
+//ESTRUTURA QUE REPRESENTA UM SIMBOLO NA TABELA DE SIMBOLOS
 typedef struct symbol {
     char* identifier;
     int type;
@@ -23,14 +23,14 @@ typedef struct symbol {
 } Symbol;
 
 
+//DEFINIÇÃO DAS FUNÇÕES PRESENTE NA TABELA DE SIMBOLOS
+
 void iniciarTabela();
 unsigned int hash(char* key);
-
 Symbol* inserirSimbolo( int type, char* identifier);
 Symbol* retornaSimbolo(char* identifier);
 void removerSimbolo(char* identifier);
 void print_simboloTabela();
-
 void print_simboloTabela() ;
 
 #endif

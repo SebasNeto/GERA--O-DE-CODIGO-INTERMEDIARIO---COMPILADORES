@@ -6,11 +6,13 @@
 #include "ast.h"
 #include "codegen.h"
 
-ASTNode* ast_root = NULL;
+//VARIÁVEL GLOBAL QUE ARMAZENA A RAIZ DA AST
+ASTNode* astRaiz = NULL;
 
-//////////////Q ESTRUTURA AST /////////////
+////////////////////////////////// ESTRUTURA AST ///////////////////////////////////////////
 
-ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol) {
+//FUNÇÃO QUE CRIA UM NÓ PARA AST
+ASTNode* criarNoAST(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol) {
     ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
     node->type = type;
     node->left = left;
@@ -19,9 +21,10 @@ ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *sy
     return node;
 }
 
-void ast_free(ASTNode *node) {
+//FUNÇÃO RECURSIVA QUE LIBERA A MEMÓRIA PARA NÓS DA AST
+void freeAST(ASTNode *node) {
     if (!node) return;
-    ast_free(node->left);
-    ast_free(node->right);
+    freeAST(node->left);
+    freeAST(node->right);
     free(node);
 }

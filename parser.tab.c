@@ -567,13 +567,13 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    80,    80,    86,    89,    95,    96,   100,   104,   112,
-     113,   114,   119,   131,   132,   133,   138,   139,   143,   147,
-     148,   152,   155,   161,   162,   163,   164,   165,   166,   170,
-     173,   180,   191,   197,   200,   206,   212,   215,   221,   224,
-     228,   229,   230,   231,   232,   233,   237,   238,   239,   248,
-     249,   250,   260,   261,   262,   263,   267,   268,   269,   273,
-     277,   285,   292,   293,   297,   298
+       0,    80,    80,    86,    89,    95,    96,   100,   104,   113,
+     114,   115,   120,   133,   134,   135,   140,   141,   145,   149,
+     150,   154,   157,   163,   164,   165,   166,   167,   168,   172,
+     175,   182,   193,   199,   202,   208,   214,   217,   223,   226,
+     230,   231,   232,   233,   234,   235,   239,   240,   241,   250,
+     251,   252,   262,   263,   264,   265,   269,   270,   271,   275,
+     279,   287,   293,   294,   298,   299
 };
 #endif
 
@@ -1210,7 +1210,7 @@ yyreduce:
   case 2: /* programa: lista_decl lista_com  */
 #line 80 "parser.y"
                         {
-        ast_root = ast_create_node(AST_PROGRAM, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
+        astRaiz = criarNoAST(AST_PROGRAM, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
     }
 #line 1216 "parser.tab.c"
     break;
@@ -1218,7 +1218,7 @@ yyreduce:
   case 3: /* lista_decl: lista_decl decl  */
 #line 86 "parser.y"
                     {
-        (yyval.astNode) = ast_create_node(AST_LIST_DECL, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
+        (yyval.astNode) = criarNoAST(AST_LIST_DECL, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
     }
 #line 1224 "parser.tab.c"
     break;
@@ -1226,7 +1226,7 @@ yyreduce:
   case 4: /* lista_decl: decl  */
 #line 89 "parser.y"
            {
-        (yyval.astNode) = ast_create_node(AST_DECL, (yyvsp[0].astNode), NULL, NULL);
+        (yyval.astNode) = criarNoAST(AST_DECL, (yyvsp[0].astNode), NULL, NULL);
     }
 #line 1232 "parser.tab.c"
     break;
@@ -1246,8 +1246,8 @@ yyreduce:
   case 7: /* decl_var: espec_tipo ID ';'  */
 #line 100 "parser.y"
                       {
-        Symbol* entry = inserirSimbolo( (yyvsp[-1].symbolEntry)->type, (yyvsp[-2].astNode)->symbol->identifier);
-        (yyval.astNode) = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
+        Symbol* entry = inserirSimbolo((yyvsp[-2].astNode)->type, (yyvsp[-1].symbolEntry)->identifier);
+        (yyval.astNode) = criarNoAST(AST_DECL_VAR, NULL, NULL, entry);
     }
 #line 1253 "parser.tab.c"
     break;
@@ -1255,341 +1255,341 @@ yyreduce:
   case 8: /* decl_var: espec_tipo ID '=' literais ';'  */
 #line 104 "parser.y"
                                      {
-        Symbol* entry = inserirSimbolo((yyvsp[-3].symbolEntry)->type, (yyvsp[-4].astNode)->symbol->identifier);
-        (yyval.astNode) = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
+        Symbol* entry = inserirSimbolo((yyvsp[-4].astNode)->type, (yyvsp[-3].symbolEntry)->identifier);
+        (yyval.astNode) = criarNoAST(AST_DECL_VAR, NULL, NULL, entry);
     }
 #line 1262 "parser.tab.c"
     break;
 
   case 9: /* espec_tipo: KW_INT  */
-#line 112 "parser.y"
-           { (yyval.astNode) = ast_create_node(AST_TYPE_INT, NULL, NULL, NULL); }
+#line 113 "parser.y"
+           { (yyval.astNode) = criarNoAST(AST_TYPE_INT, NULL, NULL, NULL); }
 #line 1268 "parser.tab.c"
     break;
 
   case 10: /* espec_tipo: KW_REAL  */
-#line 113 "parser.y"
-              { (yyval.astNode) = ast_create_node(AST_TYPE_REAL, NULL, NULL, NULL); }
+#line 114 "parser.y"
+              { (yyval.astNode) = criarNoAST(AST_TYPE_REAL, NULL, NULL, NULL); }
 #line 1274 "parser.tab.c"
     break;
 
   case 11: /* espec_tipo: VOID  */
-#line 114 "parser.y"
-           { (yyval.astNode) = ast_create_node(AST_TYPE_VOID, NULL, NULL, NULL); }
+#line 115 "parser.y"
+           { (yyval.astNode) = criarNoAST(AST_TYPE_VOID, NULL, NULL, NULL); }
 #line 1280 "parser.tab.c"
     break;
 
   case 12: /* decl_func: espec_tipo ID '(' params ')' com_comp  */
-#line 119 "parser.y"
+#line 120 "parser.y"
                                           {
-        if ((yyvsp[-5].astNode) == NULL || (yyvsp[-4].symbolEntry) == NULL) {
-            yyerror("Erro: símbolo nulo detectado na declaração da função");
-            YYABORT;
+        if ((yyvsp[-5].astNode) && (yyvsp[-5].astNode)->symbol && (yyvsp[-4].symbolEntry) && (yyvsp[-4].symbolEntry)->type) {
+            Symbol* entry = inserirSimbolo((yyvsp[-4].symbolEntry)->type, (yyvsp[-5].astNode)->symbol->identifier);
+            (yyval.astNode) = criarNoAST(AST_FUNC_DECL, NULL, NULL, entry);
+        } else {
+            yyerror("Erro na declaração da função: símbolo nulo detectado.");
+            (yyval.astNode) = NULL;
         }
-        Symbol* entry = inserirSimbolo((yyvsp[-4].symbolEntry)->type, (yyvsp[-5].astNode)->symbol->identifier);
-        (yyval.astNode) = ast_create_node(AST_FUNC_DECL, NULL, NULL, entry);
     }
-#line 1293 "parser.tab.c"
+#line 1294 "parser.tab.c"
     break;
 
   case 13: /* params: lista_param  */
-#line 131 "parser.y"
+#line 133 "parser.y"
                 { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1299 "parser.tab.c"
+#line 1300 "parser.tab.c"
     break;
 
   case 14: /* params: VOID  */
-#line 132 "parser.y"
-           { (yyval.astNode) = ast_create_node(AST_TYPE_VOID, NULL, NULL, NULL); }
-#line 1305 "parser.tab.c"
+#line 134 "parser.y"
+           { (yyval.astNode) = criarNoAST(AST_TYPE_VOID, NULL, NULL, NULL); }
+#line 1306 "parser.tab.c"
     break;
 
   case 15: /* params: %empty  */
-#line 133 "parser.y"
+#line 135 "parser.y"
                   { (yyval.astNode) = NULL; }
-#line 1311 "parser.tab.c"
+#line 1312 "parser.tab.c"
     break;
 
   case 20: /* decl_locais: %empty  */
-#line 148 "parser.y"
+#line 150 "parser.y"
                   { (yyval.astNode) = NULL; }
-#line 1317 "parser.tab.c"
+#line 1318 "parser.tab.c"
     break;
 
   case 21: /* lista_com: comando lista_com  */
-#line 152 "parser.y"
+#line 154 "parser.y"
                       {
-        (yyval.astNode) = ast_create_node(AST_LIST_COM, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
+        (yyval.astNode) = criarNoAST(AST_LIST_COM, (yyvsp[-1].astNode), (yyvsp[0].astNode), NULL);
     }
-#line 1325 "parser.tab.c"
+#line 1326 "parser.tab.c"
     break;
 
   case 22: /* lista_com: %empty  */
-#line 155 "parser.y"
+#line 157 "parser.y"
                   {
         (yyval.astNode) = NULL;
     }
-#line 1333 "parser.tab.c"
+#line 1334 "parser.tab.c"
     break;
 
   case 23: /* comando: com_expr  */
-#line 161 "parser.y"
+#line 163 "parser.y"
              { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1339 "parser.tab.c"
+#line 1340 "parser.tab.c"
     break;
 
   case 24: /* comando: com_atrib  */
-#line 162 "parser.y"
+#line 164 "parser.y"
                 { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1345 "parser.tab.c"
+#line 1346 "parser.tab.c"
     break;
 
   case 25: /* comando: com_comp  */
-#line 163 "parser.y"
+#line 165 "parser.y"
                { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1351 "parser.tab.c"
+#line 1352 "parser.tab.c"
     break;
 
   case 26: /* comando: com_selecao  */
-#line 164 "parser.y"
+#line 166 "parser.y"
                   { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1357 "parser.tab.c"
+#line 1358 "parser.tab.c"
     break;
 
   case 27: /* comando: com_repeticao  */
-#line 165 "parser.y"
+#line 167 "parser.y"
                     { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1363 "parser.tab.c"
+#line 1364 "parser.tab.c"
     break;
 
   case 28: /* comando: com_retorno  */
-#line 166 "parser.y"
+#line 168 "parser.y"
                   { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1369 "parser.tab.c"
+#line 1370 "parser.tab.c"
     break;
 
   case 29: /* com_expr: exp ';'  */
-#line 170 "parser.y"
+#line 172 "parser.y"
             {
-        (yyval.astNode) = ast_create_node(AST_EXPR, (yyvsp[-1].astNode), NULL, NULL); // Ajuste conforme necessário
+        (yyval.astNode) = criarNoAST(AST_EXPR, (yyvsp[-1].astNode), NULL, NULL);
     }
-#line 1377 "parser.tab.c"
+#line 1378 "parser.tab.c"
     break;
 
   case 30: /* com_expr: ';'  */
-#line 173 "parser.y"
+#line 175 "parser.y"
           {
-        (yyval.astNode) = ast_create_node(AST_EMPTY, NULL, NULL, NULL); // Representa um comando vazio
+        (yyval.astNode) = criarNoAST(AST_EMPTY, NULL, NULL, NULL);
     }
-#line 1385 "parser.tab.c"
+#line 1386 "parser.tab.c"
     break;
 
   case 31: /* com_atrib: var '=' exp ';'  */
-#line 180 "parser.y"
+#line 182 "parser.y"
                     {
         Symbol* varEntry = retornaSimbolo((yyvsp[-3].astNode)->symbol->identifier);
         if (!varEntry) {
             yyerror("Variável não declarada");
         }else{
-            (yyval.astNode) = ast_create_node(AST_ASSIGN, (yyvsp[-3].astNode), (yyvsp[-1].astNode), NULL);
+            (yyval.astNode) = criarNoAST(AST_ASSIGN, (yyvsp[-3].astNode), (yyvsp[-1].astNode), NULL);
         }
     }
-#line 1398 "parser.tab.c"
+#line 1399 "parser.tab.c"
     break;
 
   case 32: /* com_comp: '{' decl_locais lista_com '}'  */
-#line 191 "parser.y"
+#line 193 "parser.y"
                                   {
-        (yyval.astNode) = ast_create_node(AST_COMPOUND, (yyvsp[-2].astNode), (yyvsp[-1].astNode), NULL); // Ajuste conforme necessário
+        (yyval.astNode) = criarNoAST(AST_COMPOUND, (yyvsp[-2].astNode), (yyvsp[-1].astNode), NULL);
     }
-#line 1406 "parser.tab.c"
+#line 1407 "parser.tab.c"
     break;
 
   case 33: /* com_selecao: IF '(' exp ')' comando  */
-#line 197 "parser.y"
+#line 199 "parser.y"
                            {
-        (yyval.astNode) = ast_create_node(AST_IF, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); // Sem parte "else"
+        (yyval.astNode) = criarNoAST(AST_IF, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL);
     }
-#line 1414 "parser.tab.c"
+#line 1415 "parser.tab.c"
     break;
 
   case 34: /* com_selecao: IF '(' exp ')' com_comp ELSE comando  */
-#line 200 "parser.y"
+#line 202 "parser.y"
                                            {
-        (yyval.astNode) = ast_create_node(AST_IF_ELSE, (yyvsp[-4].astNode), (yyvsp[-2].astNode), retornaSimbolo("AST_IF_ELSE"));
+        (yyval.astNode) = criarNoAST(AST_IF_ELSE, (yyvsp[-4].astNode), (yyvsp[-2].astNode), retornaSimbolo("AST_IF_ELSE"));
     }
-#line 1422 "parser.tab.c"
+#line 1423 "parser.tab.c"
     break;
 
   case 35: /* com_repeticao: WHILE '(' exp ')' comando  */
-#line 206 "parser.y"
+#line 208 "parser.y"
                               {
-        (yyval.astNode) = ast_create_node(AST_WHILE, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); 
+        (yyval.astNode) = criarNoAST(AST_WHILE, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); 
     }
-#line 1430 "parser.tab.c"
+#line 1431 "parser.tab.c"
     break;
 
   case 36: /* com_retorno: RETURN ';'  */
-#line 212 "parser.y"
+#line 214 "parser.y"
                {
-        (yyval.astNode) = ast_create_node(AST_RETURN, NULL, NULL, NULL); 
+        (yyval.astNode) = criarNoAST(AST_RETURN, NULL, NULL, NULL); 
     }
-#line 1438 "parser.tab.c"
+#line 1439 "parser.tab.c"
     break;
 
   case 37: /* com_retorno: RETURN exp ';'  */
-#line 215 "parser.y"
+#line 217 "parser.y"
                      {
-        (yyval.astNode) = ast_create_node(AST_RETURN, (yyvsp[-1].astNode), NULL, NULL); 
+        (yyval.astNode) = criarNoAST(AST_RETURN, (yyvsp[-1].astNode), NULL, NULL); 
     }
-#line 1446 "parser.tab.c"
+#line 1447 "parser.tab.c"
     break;
 
   case 38: /* exp: exp_soma op_relac exp_soma  */
-#line 221 "parser.y"
+#line 223 "parser.y"
                                {
-        (yyval.astNode) = ast_create_node((yyvsp[-1].astNode)->type, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL);
+        (yyval.astNode) = criarNoAST((yyvsp[-1].astNode)->type, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL);
     }
-#line 1454 "parser.tab.c"
+#line 1455 "parser.tab.c"
     break;
 
   case 39: /* exp: exp_soma  */
-#line 224 "parser.y"
+#line 226 "parser.y"
                { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1460 "parser.tab.c"
+#line 1461 "parser.tab.c"
     break;
 
   case 40: /* op_relac: LEQ  */
-#line 228 "parser.y"
-        { (yyval.astNode)  = ast_create_node(AST_LEQ, NULL, NULL, NULL); }
-#line 1466 "parser.tab.c"
+#line 230 "parser.y"
+        { (yyval.astNode)  = criarNoAST(AST_LEQ, NULL, NULL, NULL); }
+#line 1467 "parser.tab.c"
     break;
 
   case 41: /* op_relac: LT  */
-#line 229 "parser.y"
-         { (yyval.astNode)  = ast_create_node(AST_LT, NULL, NULL, NULL); }
-#line 1472 "parser.tab.c"
+#line 231 "parser.y"
+         { (yyval.astNode)  = criarNoAST(AST_LT, NULL, NULL, NULL); }
+#line 1473 "parser.tab.c"
     break;
 
   case 42: /* op_relac: GT  */
-#line 230 "parser.y"
-         { (yyval.astNode)  = ast_create_node(AST_GT, NULL, NULL, NULL); }
-#line 1478 "parser.tab.c"
+#line 232 "parser.y"
+         { (yyval.astNode)  = criarNoAST(AST_GT, NULL, NULL, NULL); }
+#line 1479 "parser.tab.c"
     break;
 
   case 43: /* op_relac: GEQ  */
-#line 231 "parser.y"
-          { (yyval.astNode)  = ast_create_node(AST_GEQ, NULL, NULL, NULL); }
-#line 1484 "parser.tab.c"
+#line 233 "parser.y"
+          { (yyval.astNode)  = criarNoAST(AST_GEQ, NULL, NULL, NULL); }
+#line 1485 "parser.tab.c"
     break;
 
   case 44: /* op_relac: EQ  */
-#line 232 "parser.y"
-         { (yyval.astNode)  = ast_create_node(AST_EQ, NULL, NULL, NULL); }
-#line 1490 "parser.tab.c"
+#line 234 "parser.y"
+         { (yyval.astNode)  = criarNoAST(AST_EQ, NULL, NULL, NULL); }
+#line 1491 "parser.tab.c"
     break;
 
   case 45: /* op_relac: NEQ  */
-#line 233 "parser.y"
-          { (yyval.astNode)  = ast_create_node(AST_NEQ, NULL, NULL, NULL); }
-#line 1496 "parser.tab.c"
+#line 235 "parser.y"
+          { (yyval.astNode)  = criarNoAST(AST_NEQ, NULL, NULL, NULL); }
+#line 1497 "parser.tab.c"
     break;
 
   case 46: /* exp_soma: exp_soma '+' exp_mult  */
-#line 237 "parser.y"
-                          { (yyval.astNode) = ast_create_node(AST_ADD, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
-#line 1502 "parser.tab.c"
+#line 239 "parser.y"
+                          { (yyval.astNode) = criarNoAST(AST_ADD, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
+#line 1503 "parser.tab.c"
     break;
 
   case 47: /* exp_soma: exp_soma '-' exp_mult  */
-#line 238 "parser.y"
-                            { (yyval.astNode) = ast_create_node(AST_SUB, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
-#line 1508 "parser.tab.c"
+#line 240 "parser.y"
+                            { (yyval.astNode) = criarNoAST(AST_SUB, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
+#line 1509 "parser.tab.c"
     break;
 
   case 48: /* exp_soma: exp_mult  */
-#line 239 "parser.y"
+#line 241 "parser.y"
                { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1514 "parser.tab.c"
+#line 1515 "parser.tab.c"
     break;
 
   case 49: /* exp_mult: exp_mult '*' exp_simples  */
-#line 248 "parser.y"
-                             { (yyval.astNode) = ast_create_node(AST_MUL, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
-#line 1520 "parser.tab.c"
+#line 250 "parser.y"
+                             { (yyval.astNode) = criarNoAST(AST_MUL, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
+#line 1521 "parser.tab.c"
     break;
 
   case 50: /* exp_mult: exp_mult '/' exp_simples  */
-#line 249 "parser.y"
-                               { (yyval.astNode) = ast_create_node(AST_DIV, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
-#line 1526 "parser.tab.c"
+#line 251 "parser.y"
+                               { (yyval.astNode) = criarNoAST(AST_DIV, (yyvsp[-2].astNode), (yyvsp[0].astNode), NULL); }
+#line 1527 "parser.tab.c"
     break;
 
   case 51: /* exp_mult: exp_simples  */
-#line 250 "parser.y"
+#line 252 "parser.y"
                   { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1532 "parser.tab.c"
+#line 1533 "parser.tab.c"
     break;
 
   case 52: /* exp_simples: '(' exp ')'  */
-#line 260 "parser.y"
+#line 262 "parser.y"
                 { (yyval.astNode) = (yyvsp[-1].astNode); }
-#line 1538 "parser.tab.c"
+#line 1539 "parser.tab.c"
     break;
 
   case 53: /* exp_simples: var  */
-#line 261 "parser.y"
+#line 263 "parser.y"
           { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1544 "parser.tab.c"
+#line 1545 "parser.tab.c"
     break;
 
   case 54: /* exp_simples: cham_func  */
-#line 262 "parser.y"
+#line 264 "parser.y"
                 { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1550 "parser.tab.c"
+#line 1551 "parser.tab.c"
     break;
 
   case 55: /* exp_simples: literais  */
-#line 263 "parser.y"
+#line 265 "parser.y"
                { (yyval.astNode) = (yyvsp[0].astNode); }
-#line 1556 "parser.tab.c"
+#line 1557 "parser.tab.c"
     break;
 
   case 56: /* literais: LIT_INT  */
-#line 267 "parser.y"
-            { (yyval.astNode) = ast_create_node(AST_LIT_INT, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
-#line 1562 "parser.tab.c"
+#line 269 "parser.y"
+            { (yyval.astNode) = criarNoAST(AST_LIT_INT, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+#line 1563 "parser.tab.c"
     break;
 
   case 57: /* literais: LIT_REAL  */
-#line 268 "parser.y"
-               { (yyval.astNode) = ast_create_node(AST_LIT_REAL, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
-#line 1568 "parser.tab.c"
+#line 270 "parser.y"
+               { (yyval.astNode) = criarNoAST(AST_LIT_REAL, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+#line 1569 "parser.tab.c"
     break;
 
   case 58: /* literais: LIT_CHAR  */
-#line 269 "parser.y"
-               { (yyval.astNode) = ast_create_node(AST_LIT_CHAR, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
-#line 1574 "parser.tab.c"
+#line 271 "parser.y"
+               { (yyval.astNode) = criarNoAST(AST_LIT_CHAR, NULL, NULL, inserirSimbolo(SYMBOL_SCALAR, yytext)); }
+#line 1575 "parser.tab.c"
     break;
 
   case 60: /* var: ID  */
-#line 277 "parser.y"
+#line 279 "parser.y"
        {
         Symbol* sym = retornaSimbolo((yyvsp[0].symbolEntry)->identifier);
         if (!sym) {
             yyerror("Variável não declarada");
         } else {
-            (yyval.astNode) = ast_create_node(AST_ID, NULL, NULL, sym);
+            (yyval.astNode) = criarNoAST(AST_ID, NULL, NULL, sym);
         }
     }
-#line 1587 "parser.tab.c"
+#line 1588 "parser.tab.c"
     break;
 
   case 61: /* var: ID '[' LIT_INT ']'  */
-#line 285 "parser.y"
+#line 287 "parser.y"
                          {
-        // Tratamento de arrays, se necessário
     }
 #line 1595 "parser.tab.c"
     break;
@@ -1788,7 +1788,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 301 "parser.y"
+#line 302 "parser.y"
 
 
 int getLineNumber(void) {
