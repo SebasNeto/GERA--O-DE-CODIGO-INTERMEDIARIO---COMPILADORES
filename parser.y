@@ -5,6 +5,7 @@
 
 #include "tabelaSimbolos.h"
 #include "ast.h"
+
 #include "codegen.h"
 #include "lex.yy.h"
 
@@ -28,7 +29,6 @@ void yyerror(const char *s);
     float floatValue;
     char *strValue;
     Symbol *symbolEntry;
-    int tipo;
     ASTNode* astNode;
 }
 
@@ -56,12 +56,12 @@ void yyerror(const char *s);
 %type <astNode> com_repeticao
 %type <astNode> com_retorno
 
-%type <symbolEntry> exp_soma
-%type <symbolEntry> exp_mult
-%type <symbolEntry> op_relac
-%type <symbolEntry> exp_simples
-%type <symbolEntry> cham_func
-%type <symbolEntry> literais
+%type <astNode> exp_soma
+%type <astNode> exp_mult
+%type <astNode> op_relac
+%type <astNode> exp_simples
+%type <astNode> cham_func
+%type <astNode> literais
 
 %type <astNode> params
 %type <astNode> decl_locais
@@ -98,15 +98,14 @@ decl:
 
 decl_var:
     espec_tipo ID ';' {
-        Symbol* entry = inserirSimbolo($1->tipo, $2->strValue);
+        Symbol* entry = inserirSimbolo( $2->type, $1->symbol->identifier);
         $$ = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
     }
     | espec_tipo ID '=' literais ';' {
-        Symbol* entry = inserirSimbolo($1->tipo, $2->strValue);
+        Symbol* entry = inserirSimbolo($2->type, $1->symbol->identifier);
         $$ = ast_create_node(AST_DECL_VAR, NULL, NULL, entry);
     }
     ;
-
 
 
 espec_tipo:
@@ -118,7 +117,11 @@ espec_tipo:
 
 decl_func:
     espec_tipo ID '(' params ')' com_comp {
-        Symbol* entry = inserirSimbolo($1->tipo, $2->strValue);
+        if ($1 == NULL || $2 == NULL) {
+            yyerror("Erro: símbolo nulo detectado na declaração da função");
+            YYABORT;
+        }
+        Symbol* entry = inserirSimbolo($2->type, $1->symbol->identifier);
         $$ = ast_create_node(AST_FUNC_DECL, NULL, NULL, entry);
     }
     ;
@@ -175,7 +178,7 @@ com_expr:
 
 com_atrib:
     var '=' exp ';' {
-        Symbol* varEntry = retornaSimbolo($1->identifier);
+        Symbol* varEntry = retornaSimbolo($1->symbol->identifier);
         if (!varEntry) {
             yyerror("Variável não declarada");
         }else{
@@ -195,7 +198,7 @@ com_selecao:
         $$ = ast_create_node(AST_IF, $3, $5, NULL); // Sem parte "else"
     }
     | IF '(' exp ')' com_comp ELSE comando {
-        $$ = ast_create_node(AST_IF_ELSE, $3, $5, $7); // Com parte "else"
+        $$ = ast_create_node(AST_IF_ELSE, $3, $5, retornaSimbolo("AST_IF_ELSE"));
     }
     ;
 
@@ -222,12 +225,12 @@ exp:
     ;
 
 op_relac:
-    LEQ { $$ = ast_create_node(AST_LEQ, NULL, NULL, NULL); }
-    | LT { $$ = ast_create_node(AST_LT, NULL, NULL, NULL); }
-    | GT { $$ = ast_create_node(AST_GT, NULL, NULL, NULL); }
-    | GEQ { $$ = ast_create_node(AST_GEQ, NULL, NULL, NULL); }
-    | EQ { $$ = ast_create_node(AST_EQ, NULL, NULL, NULL); }
-    | NEQ { $$ = ast_create_node(AST_NEQ, NULL, NULL, NULL); }
+    LEQ { $$  = ast_create_node(AST_LEQ, NULL, NULL, NULL); }
+    | LT { $$  = ast_create_node(AST_LT, NULL, NULL, NULL); }
+    | GT { $$  = ast_create_node(AST_GT, NULL, NULL, NULL); }
+    | GEQ { $$  = ast_create_node(AST_GEQ, NULL, NULL, NULL); }
+    | EQ { $$  = ast_create_node(AST_EQ, NULL, NULL, NULL); }
+    | NEQ { $$  = ast_create_node(AST_NEQ, NULL, NULL, NULL); }
     ;
 
 exp_soma:

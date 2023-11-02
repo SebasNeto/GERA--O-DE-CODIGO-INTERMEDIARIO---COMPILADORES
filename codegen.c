@@ -58,5 +58,42 @@ Symbol* make_label() {
 }
 
 
+TAC* generate_code(ASTNode *node) {
+    if (!node) return NULL;
 
+    TAC *code1, *code2, *result;
+
+    switch (node->type) {
+        case AST_SYMBOL:
+            return tac_create(TAC_SYMBOL, node->symbol, NULL, NULL);
+
+        case AST_ADD:
+            code1 = generate_code(node->left);
+            code2 = generate_code(node->right);
+            result = tac_create(TAC_ADD, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
+            return tac_join(tac_join(code1, code2), result);
+
+        case AST_SUB:
+            code1 = generate_code(node->left);
+            code2 = generate_code(node->right);
+            result = tac_create(TAC_SUB, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
+            return tac_join(tac_join(code1, code2), result);
+
+        // Outros casos como AST_MUL, AST_DIV, etc.
+
+        case AST_IF:
+            code1 = generate_code(node->left); // Condição IF
+            code2 = generate_code(node->right); // Corpo do IF
+            Symbol *label = make_label();
+            TAC *jumpIfFalse = tac_create(TAC_IFZ, label, code1 ? code1->res : NULL, NULL);
+            TAC *labelTac = tac_create(TAC_LABEL, label, NULL, NULL);
+            return tac_join(tac_join(tac_join(code1, jumpIfFalse), code2), labelTac);
+
+        // Outros casos como AST_WHILE, AST_ASSIGN, etc.
+
+        default:
+            printf("Tipo de nó AST não reconhecido: %d\n", node->type);
+            return NULL;
+    }
+}
 

@@ -1,16 +1,14 @@
-int a = 5;
-int b = 10;
-int c;
-
-c = a + b;
-
-if (c > 10) {
-    c = c * 2;
-} else {
-    c = c / 2;
+int fatorial(int n) {
+    if (n == 0) {
+        return 1;
+    } else {
+        return n * fatorial(n - 1);
+    }
 }
 
-while (a < 20) {
-    a = a + 1;
+void main() {
+    int num = 5;
+    int result = fatorial(num);
+    print(result);
 }
 

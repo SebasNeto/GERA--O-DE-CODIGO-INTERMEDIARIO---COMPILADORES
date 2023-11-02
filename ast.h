@@ -5,6 +5,8 @@
 
 typedef struct symbol Symbol;
 
+
+
 typedef enum {
     AST_ADD, AST_SUB, AST_MUL, AST_DIV, // Operadores aritméticos
     AST_LIT_INT, AST_LIT_REAL, AST_LIT_CHAR, // Literais
@@ -14,7 +16,7 @@ typedef enum {
     AST_TYPE_INT, AST_TYPE_REAL, AST_TYPE_VOID, 
     AST_FUNC_DECL, AST_LIST_COM, AST_EXPR,
     AST_EMPTY, AST_COMPOUND, AST_IF, AST_IF_ELSE,
-    AST_WHILE, AST_RETURN
+    AST_WHILE, AST_RETURN, AST_SYMBOL
 } ASTType;
 
 typedef struct ASTNode {
@@ -25,6 +27,7 @@ typedef struct ASTNode {
 } ASTNode;
 
 extern ASTNode* ast_root;
+
 ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol);
 void ast_free(ASTNode *node);
 

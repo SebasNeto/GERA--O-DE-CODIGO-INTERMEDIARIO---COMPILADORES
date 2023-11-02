@@ -6,6 +6,8 @@
 #include "ast.h"
 #include "codegen.h"
 
+ASTNode* ast_root = NULL;
+
 //////////////Q ESTRUTURA AST /////////////
 
 ASTNode* ast_create_node(ASTType type, ASTNode *left, ASTNode *right, Symbol *symbol) {

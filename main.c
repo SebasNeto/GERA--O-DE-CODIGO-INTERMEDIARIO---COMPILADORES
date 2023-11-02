@@ -10,12 +10,19 @@ extern int yydebug;
 extern FILE *yyin;
 extern FILE *yyout;
 
+
 int main(int argc, char **argv)
 {
     iniciarTabela();
     
     FILE *file;
+    FILE *saida;
+
     yyout = fopen("symbol_table.lex", "w+");
+    saida = fopen("saida.txt", "w+");
+    
+    stderr = saida;
+    
 
     int yydebug = 1;
     file = fopen(argv[1], "r");
@@ -28,6 +35,10 @@ int main(int argc, char **argv)
         generate_code(ast_root);  // Chama a função de geração de código
     }
 
+
+    fclose(saida);
+    fclose(file);
+    fclose(yyout);
   
     return 0;
 }

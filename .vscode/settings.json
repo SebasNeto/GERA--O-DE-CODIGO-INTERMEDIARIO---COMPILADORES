@@ -59,6 +59,7 @@
   "files.associations": {
     "*.py": "python",
     "stdio.h": "c",
-    "codegen.h": "c"
+    "codegen.h": "c",
+    "tabelasimbolos.h": "c"
   }
 }
