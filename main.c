@@ -20,9 +20,9 @@ int main(int argc, char **argv)
 
     yyout = fopen("symbol_table.lex", "w+");
 
-
     int yydebug = 1;
     file = fopen(argv[1], "r");
+
     yyin= file;
     yyparse();
     print_simboloTabela();
@@ -37,8 +37,6 @@ int main(int argc, char **argv)
         printf("Erro na compilação do AST.\n");
     }
 
-
-    fclose(saida);
     fclose(file);
     fclose(yyout);
   

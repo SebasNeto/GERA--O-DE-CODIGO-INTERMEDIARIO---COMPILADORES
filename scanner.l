@@ -63,9 +63,9 @@ void yyerror(const char *s);
 [a-zA-Z_][a-zA-Z_0-9]* {
    Symbol* entry = retornaSimbolo(yytext); 
    if (!entry) {
-      entry = inserirSimbolo(0, yytext); 
+      entry = inserirSimbolo(0, yytext);
    }
-   yylval.symbolEntry = entry;
+   yylval.symbolEntry = entry; 
    printf("ID: %s\n", yytext);
    return ID;
 }

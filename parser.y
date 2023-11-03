@@ -18,7 +18,7 @@ void yyerror(const char *s);
 
 %}
 
-%token KW_INT KW_REAL VOID
+%token <intValue> KW_INT KW_REAL VOID
 %token IF ELSE WHILE LOOP INPUT RETURN
 %token EQ LEQ LT GT GEQ NEQ
 %token LIT_INT LIT_REAL LIT_CHAR
@@ -106,8 +106,6 @@ decl_var:
         $$ = criarNoAST(AST_DECL_VAR, NULL, NULL, entry);
     }
     ;
-
-
 
 espec_tipo:
     KW_INT { $$ = criarNoAST(AST_TYPE_INT, NULL, NULL, NULL); }
@@ -241,21 +239,10 @@ exp_soma:
     | exp_mult { $$ = $1; }
     ;
 
-op_soma:
-    '+'
-    |'-'
-    ;
-
 exp_mult:
     exp_mult '*' exp_simples { $$ = criarNoAST(AST_MUL, $1, $3, NULL); }
     | exp_mult '/' exp_simples { $$ = criarNoAST(AST_DIV, $1, $3, NULL); }
     | exp_simples { $$ = $1; }
-    ;
-
-op_mult:
-    '*'
-    | '/'
-    | '%'
     ;
 
 exp_simples:
@@ -272,8 +259,15 @@ literais:
     ;
 
 cham_func:
-    ID '(' args ')'
+    ID '(' args ')' {
+        Symbol* sym = retornaSimbolo($1->identifier);
+        if (!sym) {
+            yyerror("Função não declarada");
+            $$ = NULL;
+        }
+    }
     ;
+
 
 var:
     ID {

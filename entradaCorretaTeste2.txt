@@ -1,2 +1,4 @@
 int a = 5;
 int b = 10;
+Int c;
+c = a + b;

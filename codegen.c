@@ -54,7 +54,7 @@ Symbol* make_label() {
 }
 
 
-/////////////////////////// ESTRUTURAS PARA GERAÇÃO DO CÓDIGO INTERMEDIÁRIO ///////////////
+/////////////////////////// ESTRUTURAS PARA GERAÇÃO DO CÓDIGO INTERMEDIÁRIO //////////////////////////////////
 
 //FUNÇÃO RESPONSÁVEL POR GERAR O CÓDIGO INTERMEDIÁRIO
 TAC* gerarCodigo(ASTNode *node) {
@@ -65,8 +65,38 @@ TAC* gerarCodigo(ASTNode *node) {
     }
 
     TAC *code1, *code2, *result;
+    Symbol *label, *temp;
 
     switch (node->type) {
+        case AST_PROGRAM:
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            return uneTacs(code1, code2);
+
+        case AST_DECL_VAR:
+            return criarTac(TAC_SYMBOL, node->symbol, NULL, NULL);
+
+        case AST_ID:
+            return criarTac(TAC_SYMBOL, node->symbol, NULL, NULL);
+
+        case AST_LIT_INT:
+            temp = make_temp();
+            return criarTac(AST_LIT_INT, temp, node->symbol, NULL);
+
+        case AST_LIT_REAL:
+            temp = make_temp();
+            return criarTac(AST_LIT_REAL, temp, node->symbol, NULL);
+
+        case AST_LIT_CHAR:
+            temp = make_temp(); 
+            return criarTac(AST_LIT_CHAR, temp, node->symbol, NULL);
+        
+        case AST_ASSIGN:
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            result = criarTac(TAC_MOVE, code1->res, code2->res, NULL);
+            return uneTacs(uneTacs(code1, code2), result);
+
         case AST_SYMBOL:
             printf("Depuração: Nó AST_SYMBOL encontrado.\n");
             if (!node->symbol) return NULL;
@@ -87,18 +117,29 @@ TAC* gerarCodigo(ASTNode *node) {
             if (!code1 || !code2) return NULL;
             result = criarTac(TAC_SUB, make_temp(), code1 ? code1->res : NULL, code2 ? code2->res : NULL);
             return uneTacs(uneTacs(code1, code2), result);
+        
+        case AST_MUL:
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            result = criarTac(TAC_MUL, make_temp(), code1->res, code2->res);
+            return uneTacs(uneTacs(code1, code2), result);
 
+        case AST_DIV:
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
+            result = criarTac(TAC_DIV, make_temp(), code1->res, code2->res);
+            return uneTacs(uneTacs(code1, code2), result);
 
         case AST_IF:
             printf("Depuração: Nó AST_IF encontrado.\n");
-            code1 = gerarCodigo(node->left); // Condição IF
-            code2 = gerarCodigo(node->right); // Corpo do IF
+            code1 = gerarCodigo(node->left);
+            code2 = gerarCodigo(node->right);
             if (!code1 || !code2) return NULL;
             Symbol *label = make_label();
             TAC *jumpIfFalse = criarTac(TAC_IFZ, label, code1 ? code1->res : NULL, NULL);
             TAC *labelTac = criarTac(TAC_LABEL, label, NULL, NULL);
             return uneTacs(uneTacs(uneTacs(code1, jumpIfFalse), code2), labelTac);
-
+        
         default:
             printf("Tipo de nó AST não reconhecido: %d\n", node->type);
             printf("Endereço do símbolo não reconhecido: %p\n", (void*)node->symbol);

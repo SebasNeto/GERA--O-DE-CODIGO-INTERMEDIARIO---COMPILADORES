@@ -1,6 +1,7 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+
 #include "codegen.h"
 
 #define SYMBOL_SCALAR 1
@@ -22,7 +23,6 @@ typedef struct symbol {
     struct symbol* next;
 } Symbol;
 
-
 //DEFINIÇÃO DAS FUNÇÕES PRESENTE NA TABELA DE SIMBOLOS
 
 void iniciarTabela();
@@ -31,6 +31,6 @@ Symbol* inserirSimbolo( int type, char* identifier);
 Symbol* retornaSimbolo(char* identifier);
 void removerSimbolo(char* identifier);
 void print_simboloTabela();
-void print_simboloTabela() ;
+void print_simboloTabela();
 
 #endif

@@ -1,6 +1,0 @@
-void main() {
-    int num = 5;
-    int result = fatorial(num);
-    print(result);
-}
-
